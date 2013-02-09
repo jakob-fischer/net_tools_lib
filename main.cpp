@@ -11,14 +11,14 @@
 #include <limits>
 #include <algorithm>
 #include <boost/concept_check.hpp>
-#include "reaction_network.h"
-#include "system_builder.h"
-#include "reaction_network_fileop.h"
-#include "build_network_models.h"
-#include "network_tools.h"
+#include "net_tools/reaction_network.h"
+#include "net_tools/system_builder.h"
+#include "net_tools/reaction_network_fileop.h"
+#include "net_tools/build_network_models.h"
+#include "net_tools/network_tools.h"
 
 
-#include "cl_para.h"
+#include "tools/cl_para.h"
 using namespace std;
 
 
