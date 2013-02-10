@@ -1,3 +1,13 @@
+/* author: jakob fischer (jakob@automorph.info)
+ * date: 9th February 2013
+ * description: 
+ * Tools for creating different types of complex networks and for
+ * analyzing them.
+ * 
+ * TODO Comment; 
+ * implement the couple_pan_sinha and couple_barabasi_albert functions!
+ */
+
 #ifndef NETWORK_TOOLS_H
 #define NETWORK_TOOLS_H
 
@@ -9,17 +19,6 @@
 #include <iostream>
 #include <numeric>
 #include <algorithm>
-
-/*
- * Creates a modular hierarchic network following the model of Pan and Sinha
- * the edges are inserted with random / stochastic probability
- * 
- * TODO To be implemented
- */
-
-void build_pan_sinha_stoch(std::vector< std::pair<size_t, size_t> >& edges,
-		     size_t h, size_t n, size_t m, double r, double rho_0, bool self_loop=false, bool directed=false) { 
-}
 
 
 /*
@@ -44,8 +43,7 @@ size_t bps_module_size(const std::vector<size_t> &elem_c, size_t m,
     }
     
     return bps_module_size(elem_c, m, level-1, 2*element) +
-           bps_module_size(elem_c, m, level-1, 2*element+1);
-  
+           bps_module_size(elem_c, m, level-1, 2*element+1);  
 }
 
 
@@ -78,8 +76,6 @@ size_t bps_module_offset(const std::vector<size_t> &elem_c, size_t m,
  */
 
 bool bps_same_emodule(const std::vector<size_t> & elem_c, size_t n1, size_t n2) {
-    // ensure n1 <= n2
-    
     size_t first=0;
     size_t sum=0;
     while(sum + elem_c[first] < n1) 
@@ -92,6 +88,7 @@ bool bps_same_emodule(const std::vector<size_t> & elem_c, size_t n1, size_t n2) 
  
     return first==second;  
 }
+
 
 /*
  * Calculates the maximal number of edges for networks with 'nodes' nodes.
@@ -111,15 +108,18 @@ size_t bps_max_edges(size_t nodes, bool self_loop, bool directed) {
 }
 
 
-
 /*
- * The function creates a hierarchical-modular network using the algorithm of pan-sinha
+ * The function creates a hierarchical-modular network using the algorithm 
+ * of pan-sinha. The function allows as well 'multiple' edges, setting of
+ * 'self_loop' and 'directed' networks. The network is created
  * 
  * 
  */
 
-void create_pan_sinha(std::vector< std::pair<size_t, size_t> >& edges, size_t N, size_t M,
-		     size_t h, size_t m, double r, bool multiple =false, bool self_loop=false, bool directed=false) {
+void create_pan_sinha(std::vector< std::pair<size_t, size_t> >& edges, 
+                      size_t N, size_t M, size_t h, size_t m, double r, 
+                      bool multiple =false, bool self_loop=false, 
+                      bool directed=false) {
     size_t n_el_mod=pow(2,h)*m;                   // number of elementary modules 
     size_t n_floor = floor(double(N)/n_el_mod);   // min no nodes in el. modules
     
@@ -413,63 +413,15 @@ void create_pan_sinha(std::vector< std::pair<size_t, size_t> >& edges, size_t N,
 }
 
 
-
-
-void create_barabasi_albert_old(std::vector< std::pair<size_t, size_t> > &edges, size_t N, size_t m, size_t m0, 
-			    bool allow_multiple=false) {
-    size_t no_nodes=0;	    
-    std::vector<size_t> degree;
-    std::vector<bool> available;
-    for(size_t i=0; i<N; ++i) {
-        degree.push_back(0);
-        available.push_back(true);
-    }
-	    
-    for(; no_nodes<m0; ++no_nodes) {
-	edges.push_back(std::pair<size_t, size_t>(no_nodes, no_nodes+1));
-	++degree[no_nodes];
-	++degree[no_nodes+1];
-    }
-    ++no_nodes;
-	        
-    for(; no_nodes<N; ++no_nodes) {
-        size_t sum=0;
-	for(size_t i=0; i<no_nodes; ++i) {
-	    sum += degree[i];
-	    available[i] = true;    
-	}
-	
-	for(size_t j=0; j<m; ++j) {
-	     double rnd=double(rand())/RAND_MAX;
-	     size_t next=0;
-	     
-	     while(rnd > double(degree[next])/ sum || !available[next]) {		
-	         if(available[next])
-		     rnd -= double(degree[next])/sum;
-		 
-	         ++next;
-		 
-		 if(next > N) exit(0);
-	     }
-	     
-	     available[next]=false;
-	     sum -= degree[next];
-	     edges.push_back(std::pair<size_t, size_t>(next, no_nodes));
-             ++degree[next];
-             ++degree[no_nodes];
-	}	      
-    } 
-	    
-    if(no_nodes != N) {
-        std::cout << "ERROR: Something went wrong!" << std::endl;  
-    }
-}
-
-
-
-
-void create_barabasi_albert(std::vector< std::pair<size_t, size_t> > &edges, size_t N, size_t M, 
-			    bool multiple=false, bool self_loop=false, bool directed=true) {
+/*
+ * 
+ * 
+ * 
+ */
+ 
+void create_barabasi_albert(std::vector< std::pair<size_t, size_t> > &edges, 
+                            size_t N, size_t M, bool multiple=false, 
+                            bool self_loop=false, bool directed=true) {
     std::vector<size_t> fun;
     size_t fun_sum=0;
     for(size_t i=0; i<N; ++i)
@@ -541,125 +493,9 @@ void create_barabasi_albert(std::vector< std::pair<size_t, size_t> > &edges, siz
 
 
 
-
-/*
- * Creates a simple erdos-renyi-network with n nodes and M edges. Edges are written
- * to the vector given as first parameter. Edges are indexed starting with zero. If 
- * allow_multiple is set true self loops and the multiple occurance of the same 
- * link is allowed.
- */
-
-void create_erdos_renyi(std::vector< std::pair<size_t, size_t> > &edges, size_t n, size_t M, 
-			bool allow_multiple=false, bool self_loop=false, bool directed = false) {
-    for(size_t j=edges.size(); j<M; ++j) {
-        bool found=false;
-	
-	do {  
-	    size_t first=rand()%n;  // Create node indices for link j randomly
-            size_t second=rand()%n;
-		
-	    // If applicable check for self loops and multiple occorance
-	    if(first != second || self_loop) {
-	        if(allow_multiple) {
-	            found = true;	 
-		    edges.push_back(std::pair<size_t, size_t> (first, second) );
-	        } else if(directed) {
-
-		} else {
-		    if(find(edges.begin(), edges.end(), std::pair<size_t, size_t>(first, second)) == edges.end() &&
-		       find(edges.begin(), edges.end(), std::pair<size_t, size_t>(second, first)) == edges.end()) {
-		        edges.push_back(std::pair<size_t, size_t> (first, second) );
-		        found = true;
-		    }		  
-		}  
-	    }
-	} while (!found);
-    }
-}
-
-
-
-/*
- * Creates an Erdos Renyi network with an stochastical algorithm with N nodes
- * and on average M edges. From M and the maximal number of edges a global 
- * probability for creating edges is calculated.
- */
-
-void create_erdos_renyi_stoch(std::vector< std::pair<size_t, size_t> > &edges, size_t N, size_t M, 
-			bool self_loop=false, bool directed = false) {
-    if(!self_loop && !directed) {
-        double d=double(M)/(N*(N-1)*0.5);  
-      
-        for(size_t i=0; i<N; ++i) 
-	    for(size_t j=i+1; j<N; ++j)
-	        if(double(rand())/RAND_MAX < d)
-		    edges.push_back(std::pair<size_t, size_t> (i, j) );        
-    } else if (self_loop && !directed) {
-        double d=double(M)/(N*(N-1)*0.5+N);  
-      
-        for(size_t i=0; i<N; ++i) 
-	    for(size_t j=i+1; j<N; ++j)
-	        if(double(rand())/RAND_MAX < d)
-		    edges.push_back(std::pair<size_t, size_t> (i, j) );        
-    } else if (!self_loop && directed) {
-        double d=double(M)/(N*N-N); 
-      
-        for(size_t i=0; i<N; ++i) 
-	    for(size_t j=0; j<N; ++j)
-	        if(double(rand())/RAND_MAX < d && i!=j)
-		    edges.push_back(std::pair<size_t, size_t> (i, j) );      
-      
-    } else if (self_loop && directed) {
-        double d=double(M)/(N*N);  
-      
-        for(size_t i=0; i<N; ++i) 
-	    for(size_t j=0; j<N; ++j)
-	        if(double(rand())/RAND_MAX < d)
-		    edges.push_back(std::pair<size_t, size_t> (i, j) );
-    }
-}
-
-
-/*
- * An older version - implementation of the Watts Strogatz algorithm.
- */
-
-void create_watts_strogatz_old(std::vector< std::pair<size_t, size_t> > &edges, size_t N, size_t K, double beta, bool allow_multiple=false) {
-    if(allow_multiple)
-        std::cerr << "Warning: create_watts_strogatz called with allow_multiple. Not implemented yet!" << std::endl;
-  
-    // create regular lattice
-    for(size_t i=1; i<=K/2; ++i) 
-        for(size_t j=0; j<N; ++j) 
-	    edges.push_back( std::pair<size_t, size_t>(j, (j+i)%N) );    
-	
- 
-    for(size_t i=0; i<edges.size(); ++i) {
-        if(double(rand())/RAND_MAX < beta) {
-	    size_t first=edges[i].first;
-	    bool found=false;
-	    
-	    do {
-	        size_t second=rand()%N;
-		
-		if(find(edges.begin(), edges.end(), std::pair<size_t, size_t>(first, second)) == edges.end() &&
-		   find(edges.begin(), edges.end(), std::pair<size_t, size_t>(second, first)) == edges.end() &&
-		   second != first) {
-		    edges[i].second = second;
-		    found = true;
-	        }
-	    } while (!found);
-	}
-    }
-}
-
-
-
-
-
-
-void create_watts_strogatz(std::vector< std::pair<size_t, size_t> > &edges, size_t N, size_t M, double beta, 
-			   bool multiple=false, bool self_loop=false, bool directed=true) {
+void create_watts_strogatz(std::vector< std::pair<size_t, size_t> > &edges, 
+                           size_t N, size_t M, double beta, bool multiple=false, 
+                           bool self_loop=false, bool directed=true) {
     // PARAMETERS ARE ONLY CHECKED FOR REWIRING
   
     size_t M_tmp=M;
@@ -713,8 +549,165 @@ void create_watts_strogatz(std::vector< std::pair<size_t, size_t> > &edges, size
 
 
 
-/* bad written class for simple bidirectional network analysis. not developed at the 
- * moment because R and igraph can do better.
+
+/*
+ * Creates a simple erdos-renyi-network with N nodes and M edges. Edges are written
+ * to the vector given as first parameter. Edges are indexed starting with zero. If 
+ * allow_multiple is set true self loops and the multiple occurance of the same 
+ * link is allowed.
+ */
+
+void create_erdos_renyi(std::vector< std::pair<size_t, size_t> > &edges, 
+                        size_t N, size_t M, bool allow_multiple=false, 
+                        bool self_loop=false, bool directed = false) {
+    for(size_t j=edges.size(); j<M; ++j) {
+        bool found=false;
+	
+	    do {  
+	        size_t first=rand()%N;  
+            size_t second=rand()%N;
+		
+	        // If applicable check for self loops and multiple occorance
+	        if(first != second || self_loop) {
+	            if(allow_multiple) {
+	                found = true;	 
+		            edges.push_back(std::pair<size_t, size_t> (first, second) );
+	        } else if(directed) {
+                } else {
+		            if(find(edges.begin(), edges.end(), 
+		                    std::pair<size_t, size_t>(first, second)) == edges.end() &&
+		               find(edges.begin(), edges.end(), 
+		                    std::pair<size_t, size_t>(second, first)) == edges.end()) {
+		                edges.push_back(std::pair<size_t, size_t> (first, second) );
+		                found = true;
+		            }		  
+		        }  
+	        }
+	    } while (!found);
+    }
+}
+
+
+
+
+
+
+
+/*
+ * 
+ */
+
+void couple_erdos_renyi(std::vector< std::pair<size_t, size_t> > &couples,
+                        size_t C,
+                        std::vector< std::pair<size_t, size_t> > &edges) {
+    std::vector<bool> taken_f;
+    for(size_t i=0; i<edges.size(); ++i)
+        taken_f.push_back(false);
+
+    while(C > 0) {
+	    size_t first=rand()%edges.size();	
+	    size_t second=rand()%edges.size();	
+	    
+	    if(first != second && !taken_f[first] && !taken_f[second]) {
+			couples.push_back(std::pair<size_t, size_t> (first, second));
+			taken_f[first]=true;
+			taken_f[second]=true;
+		    --C;	
+		}
+	}
+}
+
+
+/*
+ * 
+ * 
+ */
+ 
+void couple_watts_strogatz(std::vector< std::pair<size_t, size_t> > &couples,
+                           size_t C, std::vector< std::pair<size_t, size_t> > &edges) {
+    couple_erdos_renyi(couples, C, edges);   
+}
+
+
+/*
+ * 
+ * 
+ */
+ 
+ void couple_barabasi_albert(std::vector< std::pair<size_t, size_t> > &couples,
+                             size_t C, std::vector< std::pair<size_t, size_t> > &edges) {
+	// TODO replace with apropriate code that maintains the scale free property							 
+    couple_erdos_renyi(couples, C, edges);   								 
+}
+
+
+/*
+ * 
+ * 
+ * 
+ */
+
+void couple_pan_sinha(std::vector< std::pair<size_t, size_t> > &couples,
+                      size_t C, std::vector< std::pair<size_t, size_t> >& edges, 
+                      size_t N, size_t M, size_t h, size_t m, double r, 
+                      bool multiple =false, bool self_loop=false, 
+                      bool directed=false) {
+	// TODO replace with apropriate code that maintains the hierarchical property							 
+    couple_erdos_renyi(couples, C, edges);   								 						 						  
+}
+
+
+
+
+
+/*
+ * Creates an Erdos Renyi network with an stochastical algorithm with N nodes
+ * and on average M edges. From M and the maximal number of edges a global 
+ * probability for creating edges is calculated.
+ */
+
+void create_erdos_renyi_stoch(std::vector< std::pair<size_t, size_t> > &edges, 
+                              size_t N, size_t M, bool self_loop=false, 
+                              bool directed = false) {
+    if(!self_loop && !directed) {
+        double d=double(M)/(N*(N-1)*0.5);  
+      
+        for(size_t i=0; i<N; ++i) 
+	    for(size_t j=i+1; j<N; ++j)
+	        if(double(rand())/RAND_MAX < d)
+		    edges.push_back(std::pair<size_t, size_t> (i, j) );        
+    } else if (self_loop && !directed) {
+        double d=double(M)/(N*(N-1)*0.5+N);  
+      
+        for(size_t i=0; i<N; ++i) 
+	    for(size_t j=i+1; j<N; ++j)
+	        if(double(rand())/RAND_MAX < d)
+		    edges.push_back(std::pair<size_t, size_t> (i, j) );        
+    } else if (!self_loop && directed) {
+        double d=double(M)/(N*N-N); 
+      
+        for(size_t i=0; i<N; ++i) 
+	    for(size_t j=0; j<N; ++j)
+	        if(double(rand())/RAND_MAX < d && i!=j)
+		    edges.push_back(std::pair<size_t, size_t> (i, j) );      
+      
+    } else if (self_loop && directed) {
+        double d=double(M)/(N*N);  
+      
+        for(size_t i=0; i<N; ++i) 
+	    for(size_t j=0; j<N; ++j)
+	        if(double(rand())/RAND_MAX < d)
+		    edges.push_back(std::pair<size_t, size_t> (i, j) );
+    }
+}
+
+
+
+
+
+/* bad written class for simple bidirectional network analysis. not 
+ * developed and propperly commented at the moment because R and igraph 
+ * can do better.
  */
 
 
@@ -1183,6 +1176,7 @@ public:
 	std::cout << std::endl;
      } 
 };
+
 
 
 

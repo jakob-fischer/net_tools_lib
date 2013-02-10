@@ -1,8 +1,11 @@
-/*
- *   Programm with C++ Tools for generating different reaction networks 
- *   and transforming between them
+/* author: jakob fischer (jakob@automorph.info)
+ * date: 9th February 2013
+ * description: 
+ * Programm with C++ Tools for generating different types of complex
+ * networks / reaction networks and transforming between them.
  * 
- *   TODO: Dokumentieren. Das handling reversibler reaktionen eindeutig gestatlen.
+ * TODO: Document. Handling of reversible reactions should be more 
+ * clear...
  */
 
 #include <iostream>
@@ -11,43 +14,39 @@
 #include <limits>
 #include <algorithm>
 #include <boost/concept_check.hpp>
+
 #include "net_tools/reaction_network.h"
-#include "net_tools/system_builder.h"
 #include "net_tools/reaction_network_fileop.h"
 #include "net_tools/build_network_models.h"
 #include "net_tools/network_tools.h"
-
-
 #include "tools/cl_para.h"
 using namespace std;
 
 
 /*
- * 
- * 
- * 
+ * Transforms a reaction network given by reaction list/vector to a 
+ * bidirectional network 'bd_nw'
  */
 
 void rn_to_bdn(std::vector<reaction>& re, bd_network& bd_nw) {
     for(size_t i=0; i<re.size(); ++i) {
         for(size_t m=0; m<re[i].get_no_educt_s(); ++m) {
-	    for(size_t n=0; n<re[i].get_no_product_s(); ++n) {
-	        bd_nw.add_edge(re[i].get_educt_id(m), 
-			       re[i].get_product_id(n));  
+	        for(size_t n=0; n<re[i].get_no_product_s(); ++n) {
+	            bd_nw.add_edge(re[i].get_educt_id(m), 
+			    re[i].get_product_id(n));  
+	        }
 	    }
-	}
     }
 }
 
 
-
 /*
- * 
+ *  
  * 
  */
 
 void rm_diffusion(vector<reaction>& re, size_t a, size_t b) {
-        reaction rea_1;
+    reaction rea_1;
 	reaction rea_2;
 	
 	rea_1.add_educt(a);
@@ -58,11 +57,34 @@ void rm_diffusion(vector<reaction>& re, size_t a, size_t b) {
 	
 	rea_1.set_c(1.0);
 	rea_2.set_c(1.0);
+	rea_1.set_k(1.0);
+	rea_2.set_k(1.0);
 	
 	re.push_back(rea_1);
 	re.push_back(rea_2);
 }
 
+
+/*
+ * Macro for adding a reaction in the form "A ---> B". 
+ * ae - activation energy
+ */
+
+void rm_1to1(vector<reaction>& re, size_t a, size_t b, double ae=0.0) {
+    reaction rea;
+    rea.set_activation(ae);
+    rea.set_reversible(false);
+    rea.add_educt(a);
+    rea.add_product(b);
+    
+    re.push_back(rea);  
+}
+
+
+/*
+ * Macro for adding a reaction in the form "A <--> B". 
+ * ae - activation energy
+ */
 
 void rm_1to1rev(vector<reaction>& re, size_t a, size_t b, double ae=0.0) {
     reaction rea;
@@ -74,7 +96,31 @@ void rm_1to1rev(vector<reaction>& re, size_t a, size_t b, double ae=0.0) {
     re.push_back(rea);  
 }
 
-void rm_2to2rev(vector<reaction>& re, size_t a, size_t b, size_t c, size_t d, double ae) {
+
+/*
+ * Macro for adding a reaction in the form "A + B ---> C + D". 
+ * ae - activation energy
+ */
+ 
+void rm_2to2(vector<reaction>& re, size_t a, size_t b, size_t c, size_t d, double ae=0.0) {
+    reaction rea;
+    rea.set_activation(ae);
+    rea.set_reversible(false);
+    rea.add_educt(a);
+    rea.add_educt(b);
+    rea.add_product(c);
+    rea.add_product(d);
+    
+    re.push_back(rea);  
+}
+
+
+/*
+ * Macro for adding a reaction in the form "A + B <--> C + D". 
+ * ae - activation energy
+ */
+
+void rm_2to2rev(vector<reaction>& re, size_t a, size_t b, size_t c, size_t d, double ae=0.0) {
     reaction rea;
     rea.set_activation(ae);
     rea.set_reversible(true);
@@ -91,53 +137,39 @@ void rm_add_species(std::vector<species>& sp, size_t t, size_t energy_dist) {
     stringstream ss;
     ss << "A_" << t;
 				
-    sp.push_back(species(t, ss.str(), false, 0));
+    sp.push_back(species(sp.size(), ss.str(), false, 0));
     if(energy_dist == 0) {
         sp.back().set_energy(-double(rand())/RAND_MAX);
     } else {
         // WARNING Not implemented yet
-	sp.back().set_energy(double(rand())/RAND_MAX);
+	    sp.back().set_energy(double(rand())/RAND_MAX);
     }
 }
+
 
 void rm_add_species_ne(std::vector<species>& sp, size_t t) {
     stringstream ss;
     ss << "A_" << t;
 	
-    sp.push_back(species(t, ss.str(), false, 0));  
+    sp.push_back(species(sp.size(), ss.str(), false, 0));  
+    sp.back().set_energy(0);
+}
+
+
+void rm_add_species_ne(std::vector<species>& sp, const std::string& name) {
+    sp.push_back(species(sp.size(), name, false, 0));
     sp.back().set_energy(0);
 }
 
 
 
-
-
+/*
+ * main
+ */
 
 int main(int argc, const char* argv[]) {
     srand(time(0));
-    
     cl_para cl(argc, argv);  
-  
-    if(cl.have_param("test_pan_sinha")) {
-        std::vector< std::pair<size_t, size_t> > edges;  
-	size_t h=2;
-	size_t N=100;
-	size_t M=400;
-	size_t m=5;
-	double r=0.4;
-      
-        cout << "Creating test network in test.jrnf" << endl;
-    
-        create_pan_sinha(edges, N, M, h, m, r);
-	
-	ofstream out("pan_sinha.el");
-	for(size_t i=0; i<edges.size(); ++i) {
-	    out << "    " << edges[i].first << "    " << edges[i].second << endl;  
-	}
-    }
-    
-    
-    
     
     /*
      * Function generates a small test network in jrnf-format
@@ -145,51 +177,31 @@ int main(int argc, const char* argv[]) {
      *
      *  A      <--->    B 
      *  C      <--->    E
-     *  A + C  ---->    2 B
-     *  D + B  ---->    2 D
-     *  F + E  ---->    A + C
+     *  A + C  <--->    2 B
+     *  D + B  <--->    2 D
+     *  F + E  <--->    A + C
      */
     
     if(cl.have_param("create_test_network")) {
         cout << "Creating test network in test.jrnf" << endl;
 	
         std::vector<species> sp;  
-	std::vector<reaction> re;
+	    std::vector<reaction> re;
       
-	sp.push_back(species(0, "A"));
-	sp.push_back(species(1, "B"));
-	sp.push_back(species(2, "C"));
-	sp.push_back(species(3, "D"));
-	sp.push_back(species(4, "E"));
-	sp.push_back(species(5, "F"));
+	    rm_add_species_ne(sp, "A");
+	    rm_add_species_ne(sp, "B");
+	    rm_add_species_ne(sp, "C");
+	    rm_add_species_ne(sp, "D");
+	    rm_add_species_ne(sp, "E");
+	    rm_add_species_ne(sp, "F");
+	    
+	    rm_1to1rev(re, 0, 1);
+	    rm_1to1rev(re, 2, 4);
+	    rm_2to2rev(re, 0, 2, 1, 1);
+	    rm_2to2rev(re, 3, 1, 3, 3);
+	    rm_2to2rev(re, 4, 5, 0, 2);
 	
-	re.push_back(reaction());
-	re.back().set_reversible(true);
-        re.back().add_educt(0, 1.0);
-        re.back().add_product(1, 1.0);
-	
-      	re.push_back(reaction());
-	re.back().set_reversible(true);
-        re.back().add_educt(2, 1.0);
-        re.back().add_product(4, 1.0);
-	
-	re.push_back(reaction());
-	re.back().add_educt(0, 1.0);
-	re.back().add_educt(2, 1.0);
-	re.back().add_product(1, 2.0);	
-	
-	re.push_back(reaction());
-	re.back().add_educt(3, 1.0);
-	re.back().add_educt(1, 1.0);
-	re.back().add_product(3, 2.0);	
-	
-	re.push_back(reaction());
-	re.back().add_educt(4, 1.0);
-	re.back().add_educt(5, 1.0);
-	re.back().add_product(0, 1.0);
-	re.back().add_product(2, 1.0);	
-	
-	write_jrnf_reaction_n("test.jrnf", sp, re);
+	    write_jrnf_reaction_n("test.jrnf", sp, re);
     }
     
     
@@ -208,40 +220,21 @@ int main(int argc, const char* argv[]) {
         cout << "Creating test network in test2.jrnf" << endl;
 	
         std::vector<species> sp;  
-	std::vector<reaction> re;
+	    std::vector<reaction> re;
       
-	sp.push_back(species(0, "A"));
-	sp.push_back(species(1, "B"));
-	sp.push_back(species(2, "C"));
-	sp.push_back(species(3, "D"));
-	sp.push_back(species(4, "E"));
+	    rm_add_species_ne(sp, "A");
+	    rm_add_species_ne(sp, "B");
+	    rm_add_species_ne(sp, "C");
+	    rm_add_species_ne(sp, "D");
+	    rm_add_species_ne(sp, "E");
 	
-	re.push_back(reaction());
-        re.back().add_educt(0, 2.0);
-        re.back().add_product(1, 1.0);
-        re.back().add_product(2, 1.0);
-	
-      	re.push_back(reaction());
-        re.back().add_educt(1, 1.0);
-        re.back().add_product(4, 1.0);
-	
-	re.push_back(reaction());
-	re.back().add_educt(1, 1.0);
-	re.back().add_educt(4, 1.0);
-	re.back().add_product(3, 2.0);	
-	
-	re.push_back(reaction());
-	re.back().add_educt(3, 2.0);
-	re.back().add_product(3, 1.0);
-	re.back().add_product(2, 1.0);	
-	
-	re.push_back(reaction());
-	re.back().add_educt(3, 1.0);
-	re.back().add_educt(4, 1.0);
-	re.back().add_product(0, 1.0);
-	re.back().add_product(1, 1.0);	
-	
-	write_jrnf_reaction_n("test2.jrnf", sp, re);
+        rm_2to2(re, 0, 0, 1, 2);
+		rm_1to1(re, 1, 4);
+	    rm_2to2(re, 1, 4, 3, 3);
+	    rm_2to2(re, 3, 3, 3, 2);
+	    rm_2to2(re, 3, 4, 0, 1);
+	    
+	    write_jrnf_reaction_n("test2.jrnf", sp, re);
     }
     
    
@@ -253,23 +246,23 @@ int main(int argc, const char* argv[]) {
    
     if(cl.have_param("print_network")){
         if(!cl.have_param("in")) {
-	    cout << "You need to give parameter 'in'! Could not proceed!" << endl;
-	    return 1;  
-	}
+	        cout << "You need to give parameter 'in'! Could not proceed!" << endl;
+	        return 1;  
+	    }
                
         std::vector<species> sp;  
-	std::vector<reaction> re;
+	    std::vector<reaction> re;
       
     	std::string in=cl.get_param("in");
 		
         if(read_jrnf_reaction_n(in, sp, re)) {
-	    cout << "Error at reading jrnf-file!" << std::endl;  
-	    return 1;
-	} else {
-	    cout << "jrnf-File:" << endl;
-	    for(size_t i=0; i<re.size(); ++i) 
-	        cout << re[i].get_string(sp) << endl;
-	}
+	        cout << "Error at reading jrnf-file!" << std::endl;  
+	        return 1;
+	    } else {
+	        cout << "jrnf-File:" << endl;
+	        for(size_t i=0; i<re.size(); ++i) 
+	            cout << re[i].get_string(sp) << endl;
+	    }
     }
     
     
@@ -280,23 +273,23 @@ int main(int argc, const char* argv[]) {
     
     if(cl.have_param("translate_jrnf_sbml")) {
         if(!cl.have_param("in") || !cl.have_param("out"))  {
-	    cout << "You need to give parameters 'in' and 'out'! Could not proceed!" << endl;
-	    return 1;  
-	}
+	        cout << "You need to give parameters 'in' and 'out'! Could not proceed!" << endl;
+	        return 1;  
+	    }
 	
-	cout << "Executing: translate_jrnf_sbml!" << endl;
-	std::string in=cl.get_param("in");
-	std::string out=cl.get_param("out");
-	std::vector<species> sp;
-	std::vector<reaction> re;
+	    cout << "Executing: translate_jrnf_sbml!" << endl;
+	    std::string in=cl.get_param("in");
+	    std::string out=cl.get_param("out");
+	    std::vector<species> sp;
+	    std::vector<reaction> re;
 	
-	if(read_jrnf_reaction_n(in, sp, re)) {
-	    cout << "Error at reading jrnf-file!" << std::endl;  
-	    return 1;
-	}
+	    if(read_jrnf_reaction_n(in, sp, re)) {
+	        cout << "Error at reading jrnf-file!" << std::endl;  
+	        return 1;
+	    }
 	
-	cout << "Read file with " << sp.size() << " species and " << re.size() << " reactions!" << endl;
-	write_sbml_reaction_n(out, sp, re);	
+	    cout << "Read file with " << sp.size() << " species and " << re.size() << " reactions!" << endl;
+	    write_sbml_reaction_n(out, sp, re);	
     }
     
     
@@ -307,26 +300,27 @@ int main(int argc, const char* argv[]) {
     
     if(cl.have_param("transform_rm_species_r")) {
         if(!cl.have_param("in") || !cl.have_param("out") || !cl.have_param("sp"))  {
-	    cout << "You need to give parameters 'in', 'out' and 'sp'! Could not proceed!" << endl;
-	    return 1;  
-	}      
+	        cout << "You need to give parameters 'in', 'out' and 'sp'! Could not proceed!" << endl;
+	        return 1;  
+	    }      
       
       	cout << "Executing: transform_rm_species_r!" << endl;
-	cout << " (removing a species and all reactions with it)" << endl;
-	std::string in=cl.get_param("in");
-	std::string out=cl.get_param("out");
-	std::string sp_name=cl.get_param("sp");
-	std::vector<species> sp, sp_out;
-	std::vector<reaction> re, re_out;
+	    cout << " (removing a species and all reactions with it)" << endl;
+	    
+	    std::string in=cl.get_param("in");
+	    std::string out=cl.get_param("out");
+	    std::string sp_name=cl.get_param("sp");
+	    std::vector<species> sp, sp_out;
+	    std::vector<reaction> re, re_out;
 		
-	if(read_jrnf_reaction_n(in, sp, re)) {
-	    cout << "Error at reading jrnf-file!" << std::endl;  
-	    return 1;
-	}
+	    if(read_jrnf_reaction_n(in, sp, re)) {
+	        cout << "Error at reading jrnf-file!" << std::endl;  
+	        return 1;
+	    }
 	
-	filter_r_network_r(sp, re, sp_out, re_out, sp_name);
+	    filter_r_network_r(sp, re, sp_out, re_out, sp_name);
 		
-	write_jrnf_reaction_n(out, sp_out, re_out);
+	    write_jrnf_reaction_n(out, sp_out, re_out);
     }
 
         
@@ -338,9 +332,9 @@ int main(int argc, const char* argv[]) {
     
     if(cl.have_param("transform_rm_species_s")) {
         if(!cl.have_param("in") || !cl.have_param("out") || !cl.have_param("sp"))  {
-	    cout << "You need to give parameters 'in', 'out' and 'sp'! Could not proceed!" << endl;
-	    return 1;  
-	}      
+	        cout << "You need to give parameters 'in', 'out' and 'sp'! Could not proceed!" << endl;
+	        return 1;  
+	    }      
       
       	cout << "Executing: transform_rm_species_r!" << endl;
 	cout << " (removing a species from network - keep reduced reactions)" << endl;
@@ -371,59 +365,17 @@ int main(int argc, const char* argv[]) {
         std::cout << "mode: create_Yung_DeMore" << std::endl;
       
         std::vector<species> sp;  
-	std::vector<reaction> re;
+	    std::vector<reaction> re;
 	
-	build_model_Yung_99(sp, re);
+	    build_model_Yung_99(sp, re);
 	
-	cout << "Network having " << sp.size() << " species and " << re.size() << " reactions." << endl;
+	    cout << "Network having " << sp.size() << " species and " << re.size() << " reactions." << endl;
 	
-	
-	if(cl.have_param("tnet")) {
-	    std::string tnet=cl.get_param("tnet");
-	    cout << "Writing reaction network to " << tnet << endl;
-	    ofstream out(tnet.c_str());
-	    for(size_t i=0; i<re.size(); ++i) {
-	        out << re[i].get_string(sp) << endl;
+	    if(cl.have_param("rnet")) {
+	        std::string rnet=cl.get_param("rnet");
+	        cout << "Writing jrnf-reaction network to " << rnet << endl;
+	        write_jrnf_reaction_n(rnet, sp, re);
 	    }
-	}
-		
-	
-	if(cl.have_param("rnet")) {
-	    std::string rnet=cl.get_param("rnet");
-	    cout << "Writing jrnf-reaction network to " << rnet << endl;
-	    write_jrnf_reaction_n(rnet, sp, re);
-	}
-	
-
-	
-	if(cl.have_param("snet")) {
-            // TODO Check if this analysis is correct and needed / 
-            //      in future all analysis should be done in R code
-	  
-	    std::string snet=cl.get_param("snet");
-	
-	    std::cout << "Creating simple bidirectional network!" << std::endl;
-            bd_network nw(sp.size());
-	    rn_to_bdn(re, nw);
-	    nw.do_analyis();
-	    
-	    cout << "Average path length = " << nw.get_avg_path() << std::endl; 
-	    cout << "Average degree      = " << nw.get_avg_degree() << std::endl; 
-	    cout << "Fraction of b cl    = " << nw.get_biggest_cluster_ratio() << std::endl; 
-	    cout << "Average cl coeff    = " << nw.get_avg_clustering_coeff() << std::endl; 
-
-	    cout << "writing degree distribution to " << snet << endl;
-	    ofstream out(snet.c_str());
-	    out << "#   apl=" << nw.get_avg_path() << "  dg=" << nw.get_avg_degree();
-	    out << "  bcr=" << nw.get_biggest_cluster_ratio() << "  acl=";
-	    out << nw.get_avg_clustering_coeff() << std::endl;  
-	    
-	    double acc=1.0;
-	    for(size_t i=0; i<nw.get_degree_dist().size(); ++i) {
-	        acc -= nw.get_degree_dist()[i];
-	        out << i << "    " << nw.get_degree_dist()[i] << "    " << acc << std::endl;  
-	    }
-	}
     }
     
     
@@ -569,16 +521,6 @@ int main(int argc, const char* argv[]) {
 	build_model_Krasnopolsky_2007(sp, re);
 	
 	cout << "Network having " << sp.size() << " species and " << re.size() << " reactions." << endl;
-	
-	
-	if(cl.have_param("tnet")) {
-	    std::string tnet=cl.get_param("tnet");
-	    cout << "Writing reaction network to " << tnet << endl;
-	    ofstream out(tnet.c_str());
-	    for(size_t i=0; i<re.size(); ++i) {
-	        out << re[i].get_string(sp) << endl;
-	    }
-	}
 	
 	if(cl.have_param("rnet")) {
 	    std::string rnet=cl.get_param("rnet");
@@ -1254,232 +1196,6 @@ int main(int argc, const char* argv[]) {
 	}
     }
     
-    
-    
-    if(cl.have_param("create_BA_mm0N")) {
-        if(!cl.have_param("m") || !cl.have_param("m0") || !cl.have_param("N")) {
-	    cout << "You need to give parameters m, m0 and N! Could not proceed!" << endl;
-	    return 1;  
-	}
-	
-	size_t m0=cl.get_param_i("m0");
-        size_t m=cl.get_param_i("m");
-	size_t N=cl.get_param_i("N");
-	std::string out= cl.have_param("base") ? cl.get_param("out") : "barabasi_albert_mm0N.jrnf";
-	
-	std::cout << "mode: create_barabasi_albert_mm0N  m=" << m << "   m0=" << m0 << "   N=" << N;
-	std::cout << "    out=" << out << std::endl;
-
-	std::vector< pair<size_t, size_t> > edges;
-        create_barabasi_albert_old(edges, N, m, m0);         
-        bd_network nw(N, edges);
-	    
-	std::cout << "analyzing...";
-	nw.do_analyis();
-	
-	// TODO cleanup
-        //std::cout << std::endl;
-	//cout << "Checking degree Distribution: P_k.dat" << endl;
-	//ofstream out("P_k.dat");
-
-	//double acc=1.0;
-	//for(size_t i=0; i<nw.get_degree_dist().size(); ++i) {
-	//        acc -= nw.get_degree_dist()[i];
-	//        out << i << "    " << nw.get_degree_dist()[i] << "    " << acc << std::endl;  
-	//    }
-	    
-	vector<species> sp;
-	vector<reaction> re;
-		
-	            
-        for(size_t t=0; t<N; ++t) {
-            stringstream ss;
-            ss << "A_" << t;
-	
-	    sp.push_back(species(t, ss.str(), false, 0));  
-            sp.back().set_energy(0);
-	}
-		    
-        for(size_t t=0; t<edges.size(); ++t) 
-            rm_diffusion(re, edges[t].first, edges[t].second);  
-		    
-	write_jrnf_reaction_n(out, sp, re);
-    }
-    
-    
-    if(cl.have_param("create_BA_bi_mm0NC")) {
-        if(!cl.have_param("m") || !cl.have_param("m0") || !cl.have_param("N") || !cl.have_param("C")) {
-	    cout << "You need to give parameters m and N! Could not proceed!" << endl;
-	    return 1;  
-	}
-	
-	size_t m0= cl.get_param_i("m0");
-        size_t m=cl.get_param_i("m");
-	size_t N=cl.get_param_i("N");
-	std::string out= cl.have_param("out") ? cl.get_param("out") : "barabasi_albert_mm0N.jrnf";
-	size_t C=cl.get_param_i("C");
-	
-	size_t energy_dist=0;   // 0 <-> linear [-1, 0]    
-	                        // 1 <-> logarithmic ln([0.01,1])
-	size_t aener_dist=0;    // 0 <-> linear [0, 1]
-	                        // 1 <-> logarithmic -ln([0.01,1])
-	
-	std::cout << "mode: create_BA_bi_mm0NC  m=" << m << "   m0=" << m0 << "   N=" << N << "    C=";
-	std::cout<< C << "    out=" << out << std::endl;
-
-	std::vector< pair<size_t, size_t> > edges;
-        create_barabasi_albert(edges, N, m, m0);         
-        bd_network nw(N, edges);
-	
-	// TODO cleanup
-	//std::cout << "analyzing...";
-	//nw.do_analyis();
-	//std::cout << std::endl;
-	    
-	//cout << "Checking degree Distribution: P_k.dat" << endl;
-	//ofstream out("P_k.dat");
-
-	//double acc=1.0;
-	//for(size_t i=0; i<nw.get_degree_dist().size(); ++i) {
-	//    acc -= nw.get_degree_dist()[i];
-	//    out << i << "    " << nw.get_degree_dist()[i] << "    " << acc << std::endl;  
-	//}
-	    
-	vector<species> sp;
-	vector<reaction> re;
-		
-	            
-        for(size_t t=0; t<N; ++t) {
-            stringstream ss;
-            ss << "A_" << t;
-				
-            sp.push_back(species(t, ss.str(), false, 0));  
-	    sp.back().set_energy(0);
-	}
-		    
-        for(size_t t=0; t<edges.size(); ++t) 
-            rm_diffusion(re, edges[t].first, edges[t].second);  
-		
-	write_jrnf_reaction_n(out, sp, re);
-    }
-    
-    
-    
-    if(cl.have_param("create_WS_NKbeta")) {
-        if(!cl.have_param("N") || !cl.have_param("K")  || !cl.have_param("beta")) {
-	    cout << "You need to give parameters m and N! Could not proceed!" << endl;
-	    return 1;  
-	}
-	
-	size_t N= cl.get_param_i("N");
-        size_t K=cl.get_param_i("K");
-	double beta=cl.get_param_d("beta");
-	std::string out= cl.have_param("out") ? cl.get_param("out") : "watts_strogatz_NKbeta.jrnf";
-	
-	if(K%2 != 0) {
-	    cout << "Sorry, K has to be even!" << endl;
-	    return 1;	  
-	}
-	
-	std::cout << "mode: create_WS_NKbeta  N=" << N << "   K=" << K << "   beta=" << beta << "    out=" << out << std::endl;
-	
-	std::vector< pair<size_t, size_t> > edges;
-        create_watts_strogatz_old(edges, N, K, beta);         
-        bd_network nw(N, edges);
-	std::cout << "analyzing...";
-	nw.do_analyis();
-	  
-	// TODO cleanup
-	//std::cout << std::endl;
-	    
-	//cout << "Checking degree Distribution: P_k.dat" << endl;
-	//ofstream out("P_k.dat");
-
-	//double acc=1.0;
-	//for(size_t i=0; i<nw.get_degree_dist().size(); ++i) {
-	//    acc -= nw.get_degree_dist()[i];
-	//    out << i << "    " << nw.get_degree_dist()[i] << "    " << acc << std::endl;  
-	//}
-	    
-	vector<species> sp;
-	vector<reaction> re;
-		
-	for(size_t t=0; t<N; ++t) {
-            stringstream ss;
-	    ss << "A_" << t;
-				
-	    sp.push_back(species(t, ss.str(), false, 0));  
-	    sp.back().set_energy(0);
-	}
-		    
-        for(size_t t=0; t<edges.size(); ++t) 
-            rm_diffusion(re, edges[t].first, edges[t].second);  
-		
-	write_jrnf_reaction_n(out, sp, re);
-    }
-    
-
-    if(cl.have_param("create_WS_bi_NKbetaC")) {
-        if(!cl.have_param("N") || !cl.have_param("K")  || !cl.have_param("beta")|| !cl.have_param("C")) {
-	    cout << "You need to give parameters N, K, beta and C! Could not proceed!" << endl;
-	    return 1;  
-	}
-	
-	size_t N= cl.get_param_i("N");
-        size_t K=cl.get_param_i("K");
-	double beta=cl.get_param_d("beta");
-	size_t C=cl.get_param_i("C");
-	std::string out= cl.have_param("out") ? cl.get_param("out") : "watts_strogatz_NKbeta.jrnf";
-	
-	size_t energy_dist=0;   // 0 <-> linear [-1, 0]    
-	                        // 1 <-> logarithmic ln([0.01,1])
-	size_t aener_dist=0;    // 0 <-> linear [0, 1]
-	                        // 1 <-> logarithmic -ln([0.01,1])
-	
-	if(K%2 != 0) {
-	    cout << "Sorry, K has to be even!" << endl;
-	    return 1;	  
-	}
-	
-	std::cout << "mode: create_watts_strogatz_NKbeta  N=" << N << "   K=" << K << "   beta=" << beta;
-	std::cout<< "    out=" << out << std::endl;
-	
-	std::vector< pair<size_t, size_t> > edges;
-        create_watts_strogatz_old(edges, N, K, beta);         
-        bd_network nw(N, edges);
-	std::cout << "analyzing...";
-        nw.do_analyis();
-	std::cout << std::endl;
-	    
-	//cout << "Checking degree Distribution: P_k.dat" << endl;
-	//ofstream out("P_k.dat");
-
-	//double acc=1.0;
-	//for(size_t i=0; i<nw.get_degree_dist().size(); ++i) {
-	//    acc -= nw.get_degree_dist()[i];
-	//    out << i << "    " << nw.get_degree_dist()[i] << "    " << acc << std::endl;  
-	//}
-	    
-	vector<species> sp;
-	vector<reaction> re;
-		
-	            
-        for(size_t t=0; t<N; ++t) {
-            stringstream ss;
-            ss << "A_" << t;
-				
-	    sp.push_back(species(t, ss.str(), false, 0));  
-	    sp.back().set_energy(0);
-	}
-		    
-        for(size_t t=0; t<edges.size(); ++t) 
-            rm_diffusion(re, edges[t].first, edges[t].second);  
-		
-	write_jrnf_reaction_n(out, sp, re);
-    }
-    
-    
-    
         
     
     if(cl.have_param("help") || cl.have_param("info")) {
@@ -1488,31 +1204,31 @@ int main(int argc, const char* argv[]) {
         cout << " call with parameter 'info' or 'help' for showing this screen" << endl;
         cout << endl;
         cout << "-> create_test_network" << endl;
-	cout << " Creates a small test network in 'test.jrnf'" << endl;
-	cout << endl;
-	cout << "-> print_network" << endl;
-	cout << " Load a jrnf-file and print its reactions to the screen" << endl;
+	    cout << " Creates a small test network in 'test.jrnf'" << endl;
+	    cout << endl;
+	    cout << "-> print_network" << endl;
+	    cout << " Load a jrnf-file and print its reactions to the screen" << endl;
         cout << " --> in - Name of jrnf-file to print" << endl;
-	cout << endl;
-	cout << "-> translate_jrnf_sbml" << endl;
-	cout << " Reads a jrnf-file and writes it as sbml" << endl;
-	cout << " --> in - input file" << endl;
-	cout << " --> out - output file" << endl;
-	cout << endl;
-	cout << "-> transform_rm_species_r, transform_rm_species_s" << endl;
-	cout << " Transforms a reaction network, removing on species. Either all" << endl;
-	cout << " reactions containing the species are removed ('_r') or only" << endl;
-	cout << " the species is removed from these reactions ('_s')." << endl;
-	cout << " --> in - input file" << endl;
-	cout << " --> out - output file" << endl;
-	cout << " --> sp - name of the species to be removed" << endl;
-	cout << endl;
+	    cout << endl;
+	    cout << "-> translate_jrnf_sbml" << endl;
+	    cout << " Reads a jrnf-file and writes it as sbml" << endl;
+	    cout << " --> in - input file" << endl;
+	    cout << " --> out - output file" << endl;
+	    cout << endl;
+	    cout << "-> transform_rm_species_r, transform_rm_species_s" << endl;
+	    cout << " Transforms a reaction network, removing on species. Either all" << endl;
+	    cout << " reactions containing the species are removed ('_r') or only" << endl;
+	    cout << " the species is removed from these reactions ('_s')." << endl;
+	    cout << " --> in - input file" << endl;
+	    cout << " --> out - output file" << endl;
+	    cout << " --> sp - name of the species to be removed" << endl;
+	    cout << endl;
         cout << "-> create_ER_nM " << endl;
         cout << " Creates an Erdos Renyi network with 'n' edges and 'M' links." << endl;
         cout << " reactions are reversible (A <-> B type)." << endl;
         cout << " --> n - Number of edges" << endl;
         cout << " --> m - Number of links" << endl;
-	cout << " --> out - Output filename" << endl;
+	    cout << " --> out - Output filename" << endl;
         cout << endl;
         cout << "-> create_ER_bi_nMC " << endl;
         cout << " Creates an Erdos Renyi network with 'n' edges and 'M' links." << endl;
@@ -1521,16 +1237,16 @@ int main(int argc, const char* argv[]) {
         cout << " reactions are reversible." << endl;
         cout << " --> n - Number of edges" << endl;
         cout << " --> m - Number of links" << endl;
-	cout << " --> C - Number of link-pairs that are joined" << endl;
-	cout << " --> base - Output filename" << endl;
-	cout << endl;
-	cout << "-> create_Yung_DeMore, create_Krasnopolsky_2007_2012, create_Krasnopolsky_2012," << endl;
-	cout << "   create_Krasnopolsky_2007, create_Hadac_2011, create_Kasting_1985" << endl;
-	cout << " Create the according network model." << endl;
+	    cout << " --> C - Number of link-pairs that are joined" << endl;
+	    cout << " --> base - Output filename" << endl;
+	    cout << endl;
+	    cout << "-> create_Yung_DeMore, create_Krasnopolsky_2007_2012, create_Krasnopolsky_2012," << endl;
+	    cout << "   create_Krasnopolsky_2007, create_Hadac_2011, create_Kasting_1985" << endl;
+	    cout << " Create the according network model." << endl;
         cout << " --> rnet - File the reaction network is written to (jrnf-format)" << endl;
         cout << " --> tnet - Textual representation of network is written into file" << endl;
         cout << " --> snet - Statistical data is written here. (deprecated!)" << endl;
-	cout << endl;
+	    cout << endl;
     }    
       
     return 0;
