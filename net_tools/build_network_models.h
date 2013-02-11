@@ -7319,9 +7319,8 @@ void build_model_Kasting_1985(std::vector<species> &sp, std::vector<reaction> &r
 	
 	// R73
 	re.push_back(reaction()); 
-	re.back().add_educt(iCH3O2, 1);
-	re.back().add_educt(iHO2, 1);
-	re.back().add_product(iCH3OOH, 1);
+	re.back().add_educt(iCH3O2, 2);
+	re.back().add_product(iH3CO, 2);
 	re.back().add_product(iO2, 1);
 		
 	// R74
