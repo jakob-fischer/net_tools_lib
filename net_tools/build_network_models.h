@@ -8313,6 +8313,24 @@ void build_model_Nair_1994(std::vector<species> &sp, std::vector<reaction> &re) 
 }
 
 
+
+// TODO Vervollständigen und überprüfen
+void build_model_Pavlov_2001(std::vector<species> &sp, std::vector<reaction> &re) {
+    sp.push_back(species(sp.size(), "hv"));
+    sp.push_back(species(sp.size(), "C"));
+    sp.push_back(species(sp.size(), "H"));
+    sp.push_back(species(sp.size(), "CH"));
+    sp.push_back(species(sp.size(), "CH2"));
+    sp.push_back(species(sp.size(), "CH3"));
+    sp.push_back(species(sp.size(), "CH4"));
+    sp.push_back(species(sp.size(), "C2H2"));
+    sp.push_back(species(sp.size(), "C2H4"));
+    sp.push_back(species(sp.size(), "C2H6"));
+    sp.push_back(species(sp.size(), "C3H3"));
+}
+
+
+
 // TODO Die erstellung des Netzwerks verfollständigen...
 void build_model_Wang_1998(std::vector<species> &sp, std::vector<reaction> &re) {
 	sp.push_back(species(sp.size(), "hv"));
