@@ -175,7 +175,7 @@ void build_model_Yung_99(std::vector<species> &sp, std::vector<reaction> &re) {
 	size_t iCH3Br=83;
 	sp.push_back(species(sp.size(), "F"));
 	size_t iF=84;
-	sp.push_back(species(sp.size(), "HFl"));
+	sp.push_back(species(sp.size(), "HF"));
 	size_t iHF=85;
 	sp.push_back(species(sp.size(), "CO"));
 	size_t iCO=86;
