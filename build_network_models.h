@@ -3478,7 +3478,7 @@ void build_model_Yung_99(std::vector<species> &sp, std::vector<reaction> &re) {
 	re.back().add_educt(iBr, 1);
 	re.back().add_educt(iH2O2, 1);
 	re.back().add_product(iHBr, 1);
-	re.back().add_product(iH2O, 1);
+	re.back().add_product(iHO2, 1);
 	re.back().sorder(1.0e-11, 3000, 0, 5.0e-16, 0);
 	
 	// R383
