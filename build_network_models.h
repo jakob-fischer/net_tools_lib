@@ -3550,14 +3550,6 @@ void build_model_Yung_99(std::vector<species> &sp, std::vector<reaction> &re) {
 	re.back().add_product(iOClO, 1);
 	re.back().sorder(1.6e-12, -430, 200, 6.8e-12, 1.25);
 	
-	// R392
-	re.push_back(reaction()); 
-	re.back().add_educt(iBrO, 1);
-	re.back().add_educt(iClO, 1);
-	re.back().add_product(iBr, 1);
-	re.back().add_product(iOClO, 1);
-	re.back().sorder(1.6e-12, -430, 200, 6.8e-12, 1.25);
-
 	// R393
 	re.push_back(reaction()); 
 	re.back().add_educt(iBrO, 1);
