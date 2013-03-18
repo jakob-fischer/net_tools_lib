@@ -2722,8 +2722,8 @@ void build_model_Yung_99(std::vector<species> &sp, std::vector<reaction> &re) {
 	re.push_back(reaction()); 
 	re.back().add_educt(iHO2, 1);
 	re.back().add_educt(iCl, 1);
-	re.back().add_product(iHOCl, 1);
-	re.back().add_product(iO2, 1);
+	re.back().add_product(iOH, 1);
+	re.back().add_product(iClO, 1);
 	re.back().sorder(4.1e-11, 450, 200, 9.1e-12, 2.0);
 		
 	// R285
