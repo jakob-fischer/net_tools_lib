@@ -3991,7 +3991,7 @@ void build_model_Yung_99(std::vector<species> &sp, std::vector<reaction> &re) {
 	re.back().add_educt(iClO, 1);
 	re.back().add_educt(iSO, 1);
 	re.back().add_product(iCl, 1);
-	re.back().add_educt(iSO2, 1);
+	re.back().add_product(iSO2, 1);
 	re.back().sorder(2.8e-11, 0, 50, 2.8e-11, 1.3);
 	
 	// R451
