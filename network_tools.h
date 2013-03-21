@@ -5,6 +5,7 @@
  * analyzing them.
  *
  * TODO: In the pan-sinha code handling of level is slightly unclear
+ *       In couple-BA  how should probability of couples be calculated?
  */
 
 #ifndef NETWORK_TOOLS_H
@@ -1155,7 +1156,6 @@ void couple_pan_sinha(std::vector< std::pair<size_t, size_t> > &couples,
                               sf_ == fs && fs_ == sf || sf_ == ss && fs_ == ff)
                                 nw_prob.set(k, 0);
                     }
-
             }
         }
 
