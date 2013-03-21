@@ -57,7 +57,7 @@ public:
      * tree.
      */	
 	
-    bt_draw& set_prob(size_t id, size_t v) {
+    bt_draw& set(size_t id, size_t v) {
         size_t old=probs[0][id];
 
 	for(size_t i=0; i<e_max && probs[i].size() != 0; ++i) {
@@ -93,8 +93,8 @@ public:
 	    ++l;
 	}
 	    
-        // use set_prob-function to change entry+summation in tree
-	return set_prob(probs[0].size()-1, t);	
+        // use set-function to change entry+summation in tree
+	return set(probs[0].size()-1, t);	
     }
 	
 	
@@ -354,7 +354,7 @@ void create_pan_sinha(std::vector< std::pair<size_t, size_t> >& edges,
     // The binary tree probability distribution object is created and initialized
     bt_draw nw_prob;
     for(size_t count=0; count<N*N; ++count) {    
-        // translate to edge
+        // translate to nodes
 	size_t i=count/N;
 	size_t j=count%N;
 		
@@ -376,7 +376,7 @@ void create_pan_sinha(std::vector< std::pair<size_t, size_t> >& edges,
         edges.push_back(std::pair<size_t, size_t> (i, j) );
             
         if(!multiple)  // if no multiples allowed set prob. for next run to 0
-            nw_prob.set_prob(count, 0);	
+            nw_prob.set(count, 0);	
     }
 }
 
@@ -627,23 +627,69 @@ void couple_erdos_renyi(std::vector< std::pair<size_t, size_t> > &couples,
             N = edges[i].second;
     }
 
+    
     std::vector<bool> taken_f;  // which links are already part of a link pair
     for(size_t i=0; i<edges.size(); ++i)
         taken_f.push_back(false);
 
+    std::vector<bool> edges_m; // edges matrix (necessary if you want to maintain (not) allow multiple) 
+    if(maintain_p && !allow_multiple) {
+        for(size_t i=0; i<N*N; ++i) 
+            edges_m.push_back(false);
+
+        for(size_t i=0; i<edges.size(); ++i)
+            edges_m[edges[i].first*N+edges[i].second]=true;
+    }
+
+
     while(C > 0) {  // C pairs have to be found
         size_t first=rand()%edges.size();	
 	size_t second=rand()%edges.size();	
-	
+        
+        bool legal=true;  // is this pair legal with all boundary conditions	
+
+
+
         // both partners have to be different and free...    
-	if(first != second && !taken_f[first] && !taken_f[second]) {
+	if(first == second || taken_f[first] || taken_f[second])
+            legal=false;
+
+        // If properties from network creation are to be maintained special
+        // checks are necessary
+        if(maintain_p) {
+            size_t ff(edges[first].first), fs(edges[first].second);
+            size_t sf(edges[second].first), ss(edges[second].second);
+                
+            if(!self_loop && (ff == ss || fs == sf))
+                legal=false;
+
+            if(!allow_multiple) {
+                if(edges_m[ff*N+ss] || edges_m[sf*N+fs]) 
+                    legal=false;
+
+                if(!directed)
+                    if(edges_m[ss*N+ff] || edges_m[fs*N+sf]) 
+                        legal=false;
+            }
+        } 
+
+
+        // if still legal: do it!
+        if(legal) {
 	    couples.push_back(std::pair<size_t, size_t> (first, second));
 	    taken_f[first]=true;
 	    taken_f[second]=true;
 	    --C;	
+            
+            size_t ff(edges[first].first), fs(edges[first].second);
+            size_t sf(edges[second].first), ss(edges[second].second);
+
+            if(maintain_p && !allow_multiple) 
+                edges_m[ff*N+ss]=edges_m[sf*N+fs]=true;
 	}
     }
 }
+
 
 
 /*
@@ -656,49 +702,140 @@ void couple_erdos_renyi(std::vector< std::pair<size_t, size_t> > &couples,
                 written to 0-based 
  * C          - number of couples that are drawn
  * edges      - pairs vector containing the original networks edges
- * N          - Parameter used for generating the ws-model (needed to maintain clustering)
- * beta       - shuffling parameter in watz-strogatz-model necessary so newly added
- *              links (in imaginary substrate graph) have beta as shuffling probability          
- * 
- * TODO: measure beta from network? Check if algorithm always terminates! 
- * TODO: Should this algorithm be extended to allow maintaining the network
- *       constraints (self_loop, ...) for the sustrate graph    
+ *
+ * maintain_p - maintain properties of original network in substrate graph
+ *              (properties to maintain have to be given in following parameters)
+ * allow_multiple  - the same link can occur multiple times
+ * self_loop       - self loops are allowed
+ * directed        - directed network is created
+ *
+ * TODO:      check!
  */
+
+size_t cws_links_cy_dist(size_t a, size_t b, size_t N) {
+    size_t a_amb = std::abs(a-b);
+    size_t a_amb2 = std::abs(N-a_amb);
+
+    return std::min(a_amb, a_amb2);
+}
+
  
 void couple_watts_strogatz(std::vector< std::pair<size_t, size_t> > &couples,
                            size_t C, std::vector< std::pair<size_t, size_t> > &edges,
-                           size_t N, double beta) {
+                           bool maintain_p=false, bool allow_multiple=false, 
+                           bool self_loop=false, bool directed = false) {
+    // Calculate N and M 
     size_t M=edges.size();
+    size_t N=0;
+    for(size_t i=0; i<M; ++i) {
+        if(edges[i].first > N)
+            N = edges[i].first;
+
+        if(edges[i].second > N)
+            N = edges[i].second;
+    }
+
+
     size_t close_v = ceil(double(M)/N); // needed to count which additional "connections" are far
 
-    std::vector<bool> taken_f;  // which links are already part of a link pair
-    for(size_t i=0; i<M; ++i)
-        taken_f.push_back(false);
+    std::vector<bool> edges_m; // edges matrix (necessary if you want to maintain (not) allow multiple) 
+    if(maintain_p && !allow_multiple) {
+        for(size_t i=0; i<N*N; ++i) 
+            edges_m.push_back(false);
 
-    size_t far_links = C*beta;  // TODO: Maybe measure beta by hand?
+        for(size_t i=0; i<edges.size(); ++i)
+            edges_m[edges[i].first*N+edges[i].second]=true;
+    }
 
-    while(C > 0) {
-        size_t i=rand()%M;
-        size_t j=rand()%M;
-        if(i != j && !taken_f[i] && !taken_f[j]) {
-            size_t count=0;         // number of far edges introduced by this couple 
-            if(edges[i].first-edges[j].second > close_v)
-                ++count;
+    // count number of far links (regarding cyclic structure further appart edges than close_v)
+    size_t far_links = 0;
+    for(size_t i=0; i<edges.size(); ++i) 
+        if(cws_links_cy_dist(edges[i].first, edges[i].second, N) > close_v)
+            ++far_links;
+    
+    size_t prob_far_far=100000.0*double(far_links)/N*double(far_links)/N;
+    size_t prob_clo_clo=100000.0*(1-double(far_links)/N)*(1-double(far_links)/N);
+    size_t prob_far_clo=100000.0*double(far_links)/N*(1-double(far_links)/N);
 
-            if(edges[j].first-edges[i].second > close_v)
-                ++count;
+    // The binary tree probability distribution object is created and initialized
+    bt_draw nw_prob;
+    for(size_t count=0; count<M*M; ++count) {    
+        // translate to edge
+	size_t i=count/M;
+	size_t j=count%M;
+        
+        size_t ff(edges[i].first), fs(edges[i].second), sf(edges[j].first), ss(edges[j].second);  
+        size_t closenes=size_t(cws_links_cy_dist(ff, ss, N) > close_v) + 
+                        size_t(cws_links_cy_dist(sf, fs, N) > close_v);
 
-            if(count <= far_links) {   // Dont have to many far links
-                if(count == 0 && C < far_links) {   // Avoid adding to few far links
-	                couples.push_back(std::pair<size_t, size_t> (i, j));
-	                taken_f[i]=true;
-	                taken_f[j]=true;
+        bool legal=true;  // is this pair legal with all boundary conditions	
 
-				    C -= 1;
-				    far_links -= count;
-				}
-			}
-  
+
+
+        // both partners have to be different    
+	if(i == j)
+            legal=false;
+
+        // If properties from network creation are to be maintained special
+        // checks are necessary
+        if(maintain_p) {                
+            if(!self_loop && (ff == ss || fs == sf))
+                legal=false;
+
+            if(!allow_multiple) {
+                if(edges_m[ff*N+ss] || edges_m[sf*N+fs]) 
+                    legal=false;
+
+                if(!directed)
+                    if(edges_m[ss*N+ff] || edges_m[fs*N+sf]) 
+                        legal=false;
+            }
+        }
+
+        if(!legal)
+            nw_prob.add(0);
+        else if(closenes == 0) 
+            nw_prob.add(prob_clo_clo);
+        else if(closenes == 1) 
+            nw_prob.add(prob_far_clo);
+        else
+            nw_prob.add(prob_far_far);
+    }
+
+
+    for(size_t a=0; a<C; ++a) {  	
+	// draw random number and find asocciated entry
+	size_t count=nw_prob.draw();
+		
+	// translate to edges
+	size_t i=count/M;
+	size_t j=count%M;
+			
+        couples.push_back(std::pair<size_t, size_t> (i, j) );
+            
+        // UPDATE
+        nw_prob.set(count, 0); // Don't want to see this again
+        
+        // If we don't allow multiple we have to set all probabilities of couples
+        // coinciding with the newly created couple to zero (may take a while)
+        if(maintain_p && !allow_multiple) {
+            size_t ff(edges[i].first), fs(edges[i].second), sf(edges[j].first), ss(edges[j].second);            
+            
+            for(size_t k=0; k<M*M; ++k) 
+                if(nw_prob.get(k)) {     // Only have to think about couples with non-zero probability
+	            size_t e1=k/M;
+	            size_t e2=k%M;
+                    size_t ff_(edges[e1].first), fs_(edges[e1].second), sf_(edges[e2].first), ss_(edges[e2].second);  
+                     
+                    if(ff_ == ff && ss_ == ss || ff_ == sf && ss_ == fs ||
+                       sf_ == sf && fs_ == fs || sf_ == ff && fs_ == ss)
+                        nw_prob.set(k, 0);
+
+                    if(!directed)   // 4 more cases
+                        if(ff_ == ss && ss_ == ff || ff_ == fs && ss_ == sf ||
+                           sf_ == fs && fs_ == sf || sf_ == ss && fs_ == ff)
+                            nw_prob.set(k, 0);
+                }
         }
     }
 }
@@ -714,92 +851,212 @@ void couple_watts_strogatz(std::vector< std::pair<size_t, size_t> > &couples,
                 written to 0-based 
  * C          - number of couples that are drawn
  * edges      - pairs vector containing the original networks edges
- * N          - Parameter used for generating the ws-model (needed to maintain clustering)
- * beta       - shuffling parameter in watz-strogatz-model necessary so newly added
- *              links (in imaginary substrate graph) have beta as shuffling probability          
+ *        
+ * maintain_p - maintain properties of original network in substrate graph
+ *              (properties to maintain have to be given in following parameters)
+ * allow_multiple  - the same link can occur multiple times
+ * self_loop       - self loops are allowed
+ * directed        - directed network is created
  * 
- * TODO: Should this algorithm be extended to allow maintaining the network
- *       constraints (self_loop, ...) for the sustrate graph
- *       also: should the change of functionality through virtual links
- *             be considered in probability of forming future couples?
+ * TODO: check!
  * TODO: How should the probability of adding a certain couple be estimated.
  *       maximum product of "new edges" functionality or sum of products? 
  */
  
 void couple_barabasi_albert(std::vector< std::pair<size_t, size_t> > &couples,
                             size_t C, std::vector< std::pair<size_t, size_t> > &edges,
-                            size_t N) {
-    std::vector<size_t> fun_n;
-    std::vector<bool> edge_available;
-    size_t fun_sum=0;
+                            bool maintain_p=false, bool allow_multiple=false, 
+                           bool self_loop=false, bool directed = false) {
+    // Calculate N and M 
     size_t M=edges.size();
+    size_t N=0;
+    for(size_t i=0; i<M; ++i) {
+        if(edges[i].first > N)
+            N = edges[i].first;
+
+        if(edges[i].second > N)
+            N = edges[i].second;
+    }
+
+    std::vector<bool> edges_m; // edges matrix (necessary if you want to maintain (not) allow multiple) 
+    if(maintain_p && !allow_multiple) {
+        for(size_t i=0; i<N*N; ++i) 
+            edges_m.push_back(false);
+
+        for(size_t i=0; i<edges.size(); ++i)
+            edges_m[edges[i].first*N+edges[i].second]=true;
+    }
+
+    // Vector for functionality of nodes
+    std::vector<size_t> fun_n;
+    size_t fun_sum=0;
+
     for(size_t i=0; i<N; ++i)
         fun_n.push_back(0);
-        
-    for(size_t j=0; j<M; ++j) {
-	    ++fun_n[edges[j].first];	
-		++fun_n[edges[j].second];
-		fun_sum += 2;
-		edge_available.push_back(true);
-	}
-		
-    std::vector<size_t> nw_prob_ac;
-    for(size_t k=0; k<M*M; ++k)
-	    nw_prob_ac.push_back(0);	
+
+    // Which edges are still available vor coupling?
+    std::vector<bool> edge_available;
     
-    for(size_t run=0; run<C; ++run) {
-		// setting up cummulative probability distribution
-		size_t acc=0;
-        for(size_t c=0; c<nw_prob_ac.size(); ++c) {
-			size_t i=c/M;
-			size_t j=c%M;
-			    
-			if(i != j && edge_available[i] && edge_available[j]) {
-			    size_t e1_f = edges[i].first;	
-			    size_t e1_s = edges[i].second;	
-			    size_t e2_f = edges[j].first;	
-			    size_t e2_s = edges[j].second;
-			    acc += (fun_n[e1_f]+fun_n[e1_s]+fun_n[e2_f]+fun_n[e2_s]);
-			} 
-			                
-			nw_prob_ac[c]=acc;
-	    }	
-	    
-	    // draw random number and find asocciated entry
-		size_t sum=nw_prob_ac[nw_prob_ac.size()-1];
-		double rnd=rand()%sum;
+    for(size_t j=0; j<M; ++j) {
+        ++fun_n[edges[j].first];	
+	++fun_n[edges[j].second];
+	fun_sum += 2;
+	edge_available.push_back(true);
+    }
+
+
+    // The binary tree probability distribution object is created and initialized
+    bt_draw nw_prob;
+    for(size_t count=0; count<M*M; ++count) {    
+        // translate to edge
+	size_t i=count/M;
+	size_t j=count%M;
+        
+        size_t ff(edges[i].first), fs(edges[i].second), sf(edges[j].first), ss(edges[j].second);  
+
+        bool legal=true;  // is this pair legal with all boundary conditions	
+
+
+
+        // both partners have to be different     
+	if(i == j)
+            legal=false;
+
+        // If properties from network creation are to be maintained special
+        // checks are necessary
+        if(maintain_p) {                
+            if(!self_loop && (ff == ss || fs == sf))
+                legal=false;
+
+            if(!allow_multiple) {
+                if(edges_m[ff*N+ss] || edges_m[sf*N+fs]) 
+                    legal=false;
+
+                if(!directed)
+                    if(edges_m[ss*N+ff] || edges_m[fs*N+sf]) 
+                        legal=false;
+            }
+        }
+
+        if(!legal)
+            nw_prob.add(0);
+        else
+            nw_prob.add(fun_n[ff]+fun_n[ss]+fun_n[fs]+fun_n[sf]);
+    }
+
+
+    for(size_t a=0; a<C; ++a) {  	
+	// draw random number and find asocciated entry
+	size_t count=nw_prob.draw();
+		
+	// translate to edges and nodes
+	size_t i=count/M;
+	size_t j=count%M;
+        size_t ff(edges[i].first), fs(edges[i].second), sf(edges[j].first), ss(edges[j].second);   
 			
-		size_t count=0;
-		while(nw_prob_ac[count] < rnd)
-			++count;
-			    
-		// translate to edge
-		size_t i=count/N;
-		size_t j=count%N;
-			
-        couples.push_back(std::pair<size_t, size_t> (i, j) ); 
-        edge_available[i]=false;
-        edge_available[j]=false;
-        //TODO change functionality of nodes here?           
-	}							 
+        couples.push_back(std::pair<size_t, size_t> (i, j) );
+            
+        // UPDATE
+        nw_prob.set(count, 0); // Don't want to see this again
+
+
+        // If we want to maintain probabilities for substrate graphs we have to update
+        // "virtual" functionalities und change some couples probabilities...     
+        if(maintain_p) {
+            ++fun_n[ff];	
+	    ++fun_n[fs];	
+	    ++fun_n[sf];	
+	    ++fun_n[ss];
+	    fun_sum += 4;
+
+            for(size_t k=0; k<M*M; ++k) {
+	        size_t e1=k/M;
+	        size_t e2=k%M;
+                size_t ff_(edges[e1].first), fs_(edges[e1].second), sf_(edges[e2].first), ss_(edges[e2].second);  
+
+                // This couples probability is influenced by the (virtual) functionality change?
+                if(ff == ff_ || ff == fs_ || ff == sf_ || ff == ss_ ||
+                   fs == ff_ || fs == fs_ || fs == sf_ || fs == ss_ ||
+                   sf == ff_ || sf == fs_ || sf == sf_ || sf == ss_ ||
+                   ss == ff_ || ss == fs_ || ss == sf_ || ss == ss_) 
+                    nw_prob.set(k, fun_n[ff_]+fun_n[ss_]+fun_n[fs_]+fun_n[sf_]);
+
+                // If we don't allow multiple we have to set all probabilities of couples
+                // coinciding with the newly created couple to zero (may take a while)
+
+                if(!allow_multiple) 
+                    if(nw_prob.get(k)) {     // Only have to think about couples with non-zero probability
+                        // All couples which "virtual edges" are equal to the just created "virtual edges" are set to 0 
+                        if(ff_ == ff && ss_ == ss || ff_ == sf && ss_ == fs ||
+                           sf_ == sf && fs_ == fs || sf_ == ff && fs_ == ss)
+                            nw_prob.set(k, 0);
+
+                        if(!directed)   // 4 more cases for undirected networks
+                            if(ff_ == ss && ss_ == ff || ff_ == fs && ss_ == sf ||
+                              sf_ == fs && fs_ == sf || sf_ == ss && fs_ == ff)
+                                nw_prob.set(k, 0);
+                    }
+
+            }
+        }
+
+    } 					 
 }
 
 
+
 /*
+ * For a pan-sinha-network...
+ *
+ * couples    - reference to a vector of pairs to that the selected couples are
+                written to 0-based 
+ * C          - number of couples that are drawn
+ * edges      - pairs vector containing the original networks edges
+ *
+ * h          -
+ * m          -
+ * r          -
+ *        
+ * maintain_p - maintain properties of original network in substrate graph
+ *              (properties to maintain have to be given in following parameters)
+ * allow_multiple  - the same link can occur multiple times
+ * self_loop       - self loops are allowed
+ * directed        - directed network is created
  * 
- * 
- * 
+ * TODO: check!
  */
 
 void couple_pan_sinha(std::vector< std::pair<size_t, size_t> > &couples,
                       size_t C, std::vector< std::pair<size_t, size_t> >& edges, 
-                      size_t N, size_t h, size_t m, double r) {
-	size_t n_el_mod=pow(2,h)*m;                   // number of elementary modules 
+                      size_t h, size_t m, double r,
+                      bool maintain_p=false, bool allow_multiple=false, 
+                      bool self_loop=false, bool directed = false) {
+    // Calculate N and M 
+    size_t M=edges.size();
+    size_t N=0;
+    for(size_t i=0; i<M; ++i) {
+        if(edges[i].first > N)
+            N = edges[i].first;
+
+        if(edges[i].second > N)
+            N = edges[i].second;
+    }
+
+    std::vector<bool> edges_m; // edges matrix (necessary if you want to maintain (not) allow multiple) 
+    if(maintain_p && !allow_multiple) {
+        for(size_t i=0; i<N*N; ++i) 
+            edges_m.push_back(false);
+
+        for(size_t i=0; i<edges.size(); ++i)
+            edges_m[edges[i].first*N+edges[i].second]=true;
+    }
+
+    size_t n_el_mod=pow(2,h)*m;                   // number of elementary modules 
     size_t n_floor = floor(double(N)/n_el_mod);   // min no nodes in el. modules
     
     std::vector<size_t> elem_c;      // calculate the size of elementary nodes starting by n_floor
 
-    {                                // and adding 1 until N is reached
+    {                                // and adding 1 to each until N is reached
         size_t N_tmp=N;
    
         for(size_t i=0; i<n_el_mod; ++i) { 
@@ -809,56 +1066,100 @@ void couple_pan_sinha(std::vector< std::pair<size_t, size_t> > &couples,
 
         for(size_t i=0; i<N_tmp; ++i) 
             ++elem_c[i];
-    }					  
-
-
-   // Creating lookup table for asociating every node on every level with one module
+    }
+    
+    // Creating lookup table for asociating every node on every level with one module
     std::vector<size_t> module_no;
     size_t module_no_lvl=h+2;
     for(size_t i=0; i<module_no_lvl; ++i) 
-		for(size_t j=0; j<N; ++j) 
-			module_no.push_back(bps_module_no(elem_c, m, i, j));
-						  
-						  
-    std::vector<bool> edge_available;
-    size_t M=edges.size();
-        
-    for(size_t j=0; j<M; ++j) 
-		edge_available.push_back(true);
-		
-    bt_draw nw_prob;
-    for(size_t k=0; k<M*M; ++k)
-	    nw_prob.add(0);	
+        for(size_t j=0; j<N; ++j) 
+	    module_no.push_back(bps_module_no(elem_c, m, i, j));
     
-    for(size_t run=0; run<C; ++run) {
-		// setting up cummulative probability distribution
-		size_t acc=0;
+
+    // The binary tree probability distribution object is created and initialized
+    bt_draw nw_prob;
+    for(size_t count=0; count<M*M; ++count) {    
+        // translate to edge
+	size_t i=count/M;
+	size_t j=count%M;
+        
+        size_t ff(edges[i].first), fs(edges[i].second), sf(edges[j].first), ss(edges[j].second);  
+
+        bool legal=true;  // is this pair legal with all boundary conditions	
+
+
+        // both partners have to be different     
+	if(i == j)
+            legal=false;
+
+        // If properties from network creation are to be maintained special
+        // checks are necessary
+        if(maintain_p) {                
+            if(!self_loop && (ff == ss || fs == sf))
+                legal=false;
+
+            if(!allow_multiple) {
+                if(edges_m[ff*N+ss] || edges_m[sf*N+fs]) 
+                    legal=false;
+
+                if(!directed)
+                    if(edges_m[ss*N+ff] || edges_m[fs*N+sf]) 
+                        legal=false;
+            }
+        }
+
+        if(!legal)
+            nw_prob.add(0);
+        else
+            nw_prob.add( pow(r, bps_nodes_level_comp_lu(module_no, N, ff, ss))*
+                         pow(r, bps_nodes_level_comp_lu(module_no, N, sf, fs))*100000 );
+    }
+
+
+    for(size_t a=0; a<C; ++a) {  	
+	// draw random number and find asocciated entry
+	size_t count=nw_prob.draw();
 		
-        for(size_t c=0; c<nw_prob.size(); ++c) {
-			size_t i=c/M;
-			size_t j=c%M;
-			    
-			if(i != j && edge_available[i] && edge_available[j]) {
-			    size_t e1_f = edges[i].first;	
-			    size_t e1_s = edges[i].second;	
-			    size_t e2_f = edges[j].first;	
-			    size_t e2_s = edges[j].second;
-			    nw_prob.set_prob(c, ((pow(r, bps_nodes_level_comp_lu(module_no, N, e1_f, e2_s)) +
-			             pow(r, bps_nodes_level_comp_lu(module_no, N, e2_f, e1_s)))*100000));
-			} 
-	    }	
-	    
-	    // draw random number and find asocciated entry
-		size_t count=nw_prob.draw();
-		
-		// translate to edge
-		size_t i=count/N;
-		size_t j=count%N;
+	// translate to edges and nodes
+	size_t i=count/M;
+	size_t j=count%M;
+        size_t ff(edges[i].first), fs(edges[i].second), sf(edges[j].first), ss(edges[j].second);   
 			
-        couples.push_back(std::pair<size_t, size_t> (i, j) ); 
-        edge_available[i]=false;
-        edge_available[j]=false;        
-	}							    								 						 						  
+        couples.push_back(std::pair<size_t, size_t> (i, j) );
+            
+        // UPDATE
+        nw_prob.set(count, 0); // Don't want to see this again
+
+
+        // If we want to maintain probabilities for substrate graphs we have to update
+        // "virtual" functionalities und change some couples probabilities...     
+        if(maintain_p) {
+            for(size_t k=0; k<M*M; ++k) {
+	        size_t e1=k/M;
+	        size_t e2=k%M;
+                size_t ff_(edges[e1].first), fs_(edges[e1].second), sf_(edges[e2].first), ss_(edges[e2].second);  
+
+
+                // If we don't allow multiple we have to set all probabilities of couples
+                // coinciding with the newly created couple to zero (may take a while)
+
+                if(!allow_multiple) 
+                    if(nw_prob.get(k)) {     // Only have to think about couples with non-zero probability
+                        // All couples which "virtual edges" are equal to the just created "virtual edges" are set to 0 
+                        if(ff_ == ff && ss_ == ss || ff_ == sf && ss_ == fs ||
+                           sf_ == sf && fs_ == fs || sf_ == ff && fs_ == ss)
+                            nw_prob.set(k, 0);
+
+                        if(!directed)   // 4 more cases for undirected networks
+                            if(ff_ == ss && ss_ == ff || ff_ == fs && ss_ == sf ||
+                              sf_ == fs && fs_ == sf || sf_ == ss && fs_ == ff)
+                                nw_prob.set(k, 0);
+                    }
+
+            }
+        }
+
+    } 				  
 }
 
 
