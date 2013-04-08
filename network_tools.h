@@ -4,8 +4,7 @@
  * Tools for creating different types of complex networks and for
  * analyzing them.
  *
- * TODO: In the pan-sinha code handling of level is slightly unclear
- *       In couple-BA  how should probability of couples be calculated?
+ * TODO: In couple-BA  how should probability of couples be calculated?
  */
 
 #ifndef NETWORK_TOOLS_H
@@ -32,12 +31,12 @@
 
 class bt_draw {
     // Maximum number of generations of the binary tree
-    static const size_t e_max=30; 
+    static const size_t e_max=40; 
 	
     /*
      * Contains the probabilities of the binary tree. probs[0] is the
      * vector with elementary probabilities, prob[1], prob[2], ... are
-     * the higher /earlier generations. 'last' contains the number of
+     * the higher / earlier generations. 'last' contains the number of
      * generations.
      */
     size_t last;
@@ -161,6 +160,15 @@ public:
     bt_draw(const std::vector<size_t>& p) : last(0)  {        	
 	for(size_t i=0; i<p.size(); ++i)
 	    add(p[i]);
+    }
+
+    /*
+     * Copy constructor, constructing bt_draw from bt_draw
+     */
+
+    bt_draw(const bt_draw& ref) {
+	for(size_t i=0; i<ref.probs[0].size(); ++i)
+	    add(ref.probs[0][i]);
     }
 };
 
@@ -308,8 +316,8 @@ size_t bps_nodes_level_comp_lu(const std::vector<size_t> &modules_no, size_t N,
 
 /*
  * Creates complex network following the model of Pan & Sinha. In this model a
- * network with hierarchical modular structure is created by creating by choosing
- * the linking probably accordingly.
+ * network with hierarchical modular structure is created by drawing links from
+ * the set of possible links (NxN) and choosing the linking probably accordingly.
  * 
  * edges           - reference to edgeliste where links are written to (0-based)
  * N               - number of nodes in network
@@ -337,7 +345,7 @@ void create_pan_sinha(std::vector< std::pair<size_t, size_t> >& edges,
     {                                // and adding 1 to each until N is reached
         size_t N_tmp=N;
    
-        for(size_t i=0; i<n_el_mod; ++i) { 
+        for(size_t i=0; i<n_el_mod; ++i) {  
             elem_c.push_back(n_floor);
 	        N_tmp -= n_floor;
         }
@@ -347,6 +355,7 @@ void create_pan_sinha(std::vector< std::pair<size_t, size_t> >& edges,
     }
     
     // Creating lookup table for asociating every node on every level with one module
+    // starting with the N entries for level 0, than N entries for level 1, then 2...
     std::vector<size_t> module_no;
     size_t module_no_lvl=h+2;
     for(size_t i=0; i<module_no_lvl; ++i) 
@@ -360,6 +369,8 @@ void create_pan_sinha(std::vector< std::pair<size_t, size_t> >& edges,
 	size_t i=count/N;
 	size_t j=count%N;
 		
+        // If non-directed than we require i <= j (more efficient and leads to i==j 
+        // having same probability than for example i-2 == j
 	if((directed || i <= j) && (self_loop  || i != j))  
 	    nw_prob.add( pow(r, bps_nodes_level_comp_lu(module_no, N, i, j))*100000 );
 	else 
@@ -394,8 +405,6 @@ void create_pan_sinha(std::vector< std::pair<size_t, size_t> >& edges,
  * allow_multiple  - the same link can occur multiple times
  * self_loop       - self loops are allowed
  * directed        - directed network is created
- *
- * TODO Use the bt_draw here
  */ 
  
 void create_barabasi_albert(std::vector< std::pair<size_t, size_t> > &edges, 
@@ -419,7 +428,6 @@ void create_barabasi_albert(std::vector< std::pair<size_t, size_t> > &edges,
         size_t no_n_edges = M/(N-i) > i ? i : M/(N-i);
         
         fun.add(0);
-        
 	
         for(size_t k=0; k<no_n_edges; ++k) {
 	    // try creating edge number k (until done is true)
@@ -478,7 +486,8 @@ void create_barabasi_albert(std::vector< std::pair<size_t, size_t> > &edges,
  * edges           - reference to edgeliste where links are written to (0-based)
  * N               - number of nodes in network
  * M               - number of edges / links in network
- * allow_multiple  - the same link can occur multiple times
+ * beta            - parameter governing what fraction of nodes is shuffled 
+ * multiple        - the same link can occur multiple times
  * self_loop       - self loops are allowed
  * directed        - directed network is created
  */
@@ -501,7 +510,7 @@ void create_watts_strogatz(std::vector< std::pair<size_t, size_t> > &edges,
 	    } else {
 	        edges.push_back( std::pair<size_t, size_t> (n2, n1) );
 	    }
-	--M_tmp;
+            --M_tmp;
 	}   
     }
  
@@ -590,8 +599,8 @@ void create_erdos_renyi(std::vector< std::pair<size_t, size_t> > &edges,
 
 
 /*
- * For an Erdos-Renyi-Network this function this function selects edges to 
- * couple edges. This can be used when a mixed 1 -> 1 / 2->2 - reaction
+ * For an Erdos-Renyi-Network this function selects edges to couple.
+ * This can be used when a mixed 1 -> 1 / 2->2 - reaction
  * network should be created with an Erdos-Renyi statistics of the reactants 
  * graph. There are just 'C' pairs of links selected (without replacement).
  *
@@ -689,7 +698,7 @@ void couple_erdos_renyi(std::vector< std::pair<size_t, size_t> > &couples,
 
 
 /*
- * For an Watts-Strogatz-Network this function this function selects edges to 
+ * For a Watts-Strogatz-Network this function this function selects edges to 
  * couple edges. This can be used when a mixed 1 -> 1 / 2->2 - reaction
  * network should be created with an Watts-Strogatz statistics of the reactants 
  * graph. There are just 'C' pairs of links selected (without replacement).
@@ -708,6 +717,7 @@ void couple_erdos_renyi(std::vector< std::pair<size_t, size_t> > &couples,
  * TODO:      check!
  */
 
+// Macro helper to determine "distance" 
 size_t cws_links_cy_dist(size_t a, size_t b, size_t N) {
     size_t a_amb = std::abs(a-b);
     size_t a_amb2 = std::abs(N-a_amb);
@@ -911,7 +921,6 @@ void couple_watts_strogatz(std::vector< std::pair<size_t, size_t> > &couples,
  * TODO: check!
  * TODO: How should the probability of adding a certain couple be estimated.
  *       maximum product of "new edges" functionality or sum of products? 
- * TODO: find a better memory layout (using M*(M-1)/2 instead of M*M)
  */
  
 void couple_barabasi_albert(std::vector< std::pair<size_t, size_t> > &couples,
@@ -1004,13 +1013,13 @@ void couple_barabasi_albert(std::vector< std::pair<size_t, size_t> > &couples,
         if(!legal)
             nw_prob.add(0);
         else 
-            nw_prob.add(fun_n[ff]*fun_n[ss]+fun_n[fs]*fun_n[sf]);
+            nw_prob.add(std::max(std::max(fun_n[ff],fun_n[ss]), std::max(fun_n[fs], fun_n[sf])));
         
     }
 
 
     for(size_t a=0; a<C; ++a) {  	
-        if(a%1 == 0) 
+        if(a%100 == 0) 
             std::cout << a << " / " << C << std::endl;
 
 	// draw random number and find asocciated entry
@@ -1069,7 +1078,7 @@ void couple_barabasi_albert(std::vector< std::pair<size_t, size_t> > &couples,
                 size_t ff_(edges[k].first), fs_(edges[k].second);
                 size_t sf_(edges[l].first), ss_(edges[l].second);
                 
-                nw_prob.set(i, fun_n[ff_]*fun_n[ss_]+fun_n[fs_]*fun_n[sf_]);
+                nw_prob.set(i, std::max(std::max(fun_n[ff_],fun_n[ss_]), std::max(fun_n[fs_],fun_n[sf_])));
                         
                 if(!allow_multiple) {
                     // All couples which "virtual edges" are equal to the just created "virtual edges" are set to 0 
@@ -1176,6 +1185,9 @@ void couple_pan_sinha(std::vector< std::pair<size_t, size_t> > &couples,
 	size_t i=count/M;
 	size_t j=count%M;
         
+        if(j == 0 && i%1000 == 0) 
+            std::cout << i << " / " << M << std::endl;
+
         size_t ff(edges[i].first), fs(edges[i].second), sf(edges[j].first), ss(edges[j].second);  
 
         bool legal=true;  // is this pair legal with all boundary conditions	
@@ -1213,6 +1225,9 @@ void couple_pan_sinha(std::vector< std::pair<size_t, size_t> > &couples,
 	// draw random number and find asocciated entry
 	size_t count=nw_prob.draw();
 		
+        if(a%100 == 0) 
+            std::cout << a << " / " << C << std::endl;
+
 	// translate to edges and nodes
 	size_t i=count/M;
 	size_t j=count%M;
