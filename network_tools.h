@@ -116,19 +116,21 @@ public:
     size_t draw() const {
         // Object is empty. Report error
         if(last == 0) {
-	    std::cout << "bt_draw::draw() - 'last' is zero!" << std::endl;
+	    if(probs[0].size() == 0)
+                std::cout << "bt_draw::draw() - 'last' is zero!" << std::endl;
+
 	    return 0;
 	}
 			
         // Draw random number modulo sum of all probabilities
-	size_t rnd=rand()%probs[last-1][0];
+	size_t rnd=rand()%probs[last][0];
 	    
         size_t z=0; // Selected element on the level 'i'
 
         // Going down the tree from top to bottom
-	for(size_t i=last-1; i>0; --i) {
+	for(size_t i=last; i>0; --i) {
 	    // Either not at the right flank or there, but having two childs
-	    if(z != probs[i].size()-1 || probs[i].size() == 2*probs[i-1].size()) {
+	    if(z != probs[i].size()-1 || 2*probs[i].size() == probs[i-1].size()) {
 	        if(probs[i-1][z*2] > rnd) { // going down on the left
 	            z=z*2;
 	        } else {                    // going down on the right
@@ -142,7 +144,7 @@ public:
 
 	return z;
     }
-	
+
       
     /*
      * Returns size of the distribution
@@ -151,7 +153,7 @@ public:
     size_t size() const {
 	return probs[0].size();	
     }
-	
+
 
     /*
      * Copy constructor generating bt_draw from vector
@@ -166,10 +168,24 @@ public:
      * Copy constructor, constructing bt_draw from bt_draw
      */
 
-    bt_draw(const bt_draw& ref) {
+    bt_draw(const bt_draw& ref) : last(0) {
 	for(size_t i=0; i<ref.probs[0].size(); ++i)
 	    add(ref.probs[0][i]);
     }
+
+
+
+
+     void printout() {
+       for(size_t i=0; i<=last; ++i) {
+           std::cout << i << " : ";
+           for(size_t j=0; j<probs[i].size(); ++j)
+               std::cout << probs[i][j] << " / ";
+
+           std::cout << std::endl;
+       }
+
+     }
 };
 
 
@@ -436,6 +452,8 @@ void create_barabasi_albert(std::vector< std::pair<size_t, size_t> > &edges,
 	    do {
 		// select node randomly with probability of their functionality
 	        size_t l=fun.draw();
+                 
+                //std::cout << "   drawn  l=" << l << std::endl;
 
 	        // proceed if no self loop or self loop allowed
 	        if(l != i || self_loop) {
@@ -1013,7 +1031,7 @@ void couple_barabasi_albert(std::vector< std::pair<size_t, size_t> > &couples,
         if(!legal)
             nw_prob.add(0);
         else 
-            nw_prob.add(std::max(std::max(fun_n[ff],fun_n[ss]), std::max(fun_n[fs], fun_n[sf])));
+            nw_prob.add(fun_n[fs]*fun_n[ss]);
         
     }
 
@@ -1078,7 +1096,7 @@ void couple_barabasi_albert(std::vector< std::pair<size_t, size_t> > &couples,
                 size_t ff_(edges[k].first), fs_(edges[k].second);
                 size_t sf_(edges[l].first), ss_(edges[l].second);
                 
-                nw_prob.set(i, std::max(std::max(fun_n[ff_],fun_n[ss_]), std::max(fun_n[fs_],fun_n[sf_])));
+                nw_prob.set(i, fun_n[fs_]*fun_n[ss_]);
                         
                 if(!allow_multiple) {
                     // All couples which "virtual edges" are equal to the just created "virtual edges" are set to 0 
