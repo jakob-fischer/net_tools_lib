@@ -391,7 +391,67 @@ class reaction {
     double get_c() const {
         return c;
     }
-   
+
+
+    /*
+     * Get energy of all the educts using energy vector given...
+     */
+
+    double get_energy_educts(const std::vector<double>& en) {
+        double E_educt;
+
+        for(size_t i=0; i<educts.size(); ++i) 
+	    E_educt += en[educts[i].first]*educts[i].second;
+
+        return E_educt;
+    }
+
+
+    /*
+     * Get energy of all the products using energy vector given
+     */
+
+    double get_energy_products(const std::vector<double>& en) {
+        double E_product;
+
+        for(size_t i=0; i<products.size(); ++i) 
+	    E_product += en[products[i].first]*products[i].second;
+
+        return E_product;
+    }
+
+
+    /*
+     * Get concentration of all the educts using concentration vector 
+     */
+
+    double get_concentration_educts(const std::vector<double>& con) {
+        double cn=1.0;
+
+        for(size_t i=0; i<educts.size(); ++i) 
+            for(size_t j=0; j<educts[i].second; ++j)
+	        cn *= con[educts[i].first];
+
+        return cn;
+    }
+
+
+    /*
+     * Get concentration of all the products using concentration vector given
+     */
+
+    double get_concentration_products(const std::vector<double>& con) {
+        double cn=1.0;
+
+        for(size_t i=0; i<products.size(); ++i) 
+            for(size_t j=0; j<products[i].second; ++j)
+	        cn *= con[products[i].first];
+
+        return cn;
+    }
+
+    
+ 
     
     /*
      * Set constant `c` (was used in stoch. simulation)
