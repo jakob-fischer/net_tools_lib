@@ -421,6 +421,35 @@ class reaction {
     }
 
 
+
+    /*
+     * Get energy of all the educts using energy vector given...
+     */
+
+    double get_energy_educts_exp(const std::vector<double>& en) {
+        double E_educt=1.0;
+
+        for(size_t i=0; i<educts.size(); ++i) 
+	    E_educt *= pow(en[educts[i].first],educts[i].second);
+
+        return E_educt;
+    }
+
+
+    /*
+     * Get energy of all the products using energy vector given
+     */
+
+    double get_energy_products_exp(const std::vector<double>& en) {
+        double E_product=1.0;
+
+        for(size_t i=0; i<products.size(); ++i) 
+	    E_product *= pow(en[products[i].first],products[i].second);
+
+        return E_product;
+    }
+
+
     /*
      * Get concentration of all the educts using concentration vector 
      */
