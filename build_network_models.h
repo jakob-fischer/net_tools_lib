@@ -5,17 +5,17 @@
 
 
 void build_model_2box_cli_rad(std::vector<species> &sp, std::vector<reaction> &re) {
-    sp.push_back("T_sun");
+    sp.push_back(species(sp.size(), "T_sun"));
     size_t iT_sun=0;
-    sp.push_back("T_space");
+    sp.push_back(species(sp.size(), "T_space"));
     size_t iT_space=1;
-    sp.push_back("T_atm_1");
+    sp.push_back(species(sp.size(), "T_atm_1"));
     size_t iT_atm_1=2;
-    sp.push_back("T_atm_2");
+    sp.push_back(species(sp.size(), "T_atm_2"));
     size_t iT_atm_2=3;
-    sp.push_back("T_surf_1");
+    sp.push_back(species(sp.size(), "T_surf_1"));
     size_t iT_surf_1=4;
-    sp.push_back("T_surf_2");
+    sp.push_back(species(sp.size(), "T_surf_2"));
     size_t iT_surf_2=5;
 
 
@@ -54,19 +54,19 @@ void build_model_2box_cli_rad(std::vector<species> &sp, std::vector<reaction> &r
 
 
 void build_model_1box_cli_hyd(std::vector<species> &sp, std::vector<reaction> &re) {
-    sp.push_back("T_sun");
+    sp.push_back(species(sp.size(), "T_sun"));
     size_t iT_sun=0;
-    sp.push_back("T_space");
+    sp.push_back(species(sp.size(), "T_space"));
     size_t iT_space=1;
-    sp.push_back("T_atm");
+    sp.push_back(species(sp.size(), "T_atm"));
     size_t iT_atm=2;
-    sp.push_back("T_surf");
+    sp.push_back(species(sp.size(), "T_surf"));
     size_t iT_surf=3;
-    sp.push_back("H2O_g");
+    sp.push_back(species(sp.size(), "H2O_g"));
     size_t iH2O_g=4;
-    sp.push_back("H2O_surf");
+    sp.push_back(species(sp.size(), "H2O_surf"));
     size_t iH2O_surf=5;
-    sp.push_back("H2O_atm");
+    sp.push_back(species(sp.size(), "H2O_atm"));
     size_t iH2O_atm=6;
 
         
@@ -99,29 +99,29 @@ void build_model_1box_cli_hyd(std::vector<species> &sp, std::vector<reaction> &r
 
 
 void build_model_2box_cli_hyd(std::vector<species> &sp, std::vector<reaction> &re) {
-    sp.push_back("T_sun");
+    sp.push_back(species(sp.size(), "T_sun"));
     size_t iT_sun=0;
-    sp.push_back("T_space");
+    sp.push_back(species(sp.size(), "T_space"));
     size_t iT_space=1;
-    sp.push_back("T_atm_1");
+    sp.push_back(species(sp.size(), "T_atm_1"));
     size_t iT_atm_1=2;
-    sp.push_back("T_atm_2");
+    sp.push_back(species(sp.size(), "T_atm_2"));
     size_t iT_atm_2=3;
-    sp.push_back("T_surf_1");
-    size_t iT_atm_1=4;
-    sp.push_back("T_surf_2");
-    size_t iT_atm_2=5;
-    sp.push_back("H2O_atm_1");
+    sp.push_back(species(sp.size(), "T_surf_1"));
+    size_t iT_surf_1=4;
+    sp.push_back(species(sp.size(), "T_surf_2"));
+    size_t iT_surf_2=5;
+    sp.push_back(species(sp.size(), "H2O_atm_1"));
     size_t iH2O_atm_1=6;
-    sp.push_back("H2O_atm_2");
+    sp.push_back(species(sp.size(), "H2O_atm_2"));
     size_t iH2O_atm_2=7;
-    sp.push_back("H2O_surf_1");
-    size_t iH2O_atm_1=8;
-    sp.push_back("H2O_surf_2");
-    size_t iH2O_atm_2=9;
-    sp.push_back("H2O_g_1");
+    sp.push_back(species(sp.size(), "H2O_surf_1"));
+    size_t iH2O_surf_1=8;
+    sp.push_back(species(sp.size(), "H2O_surf_2"));
+    size_t iH2O_surf_2=9;
+    sp.push_back(species(sp.size(), "H2O_g_1"));
     size_t iH2O_g_1=10;
-    sp.push_back("H2O_g_2");
+    sp.push_back(species(sp.size(), "H2O_g_2"));
     size_t iH2O_g_2=11;
 
     re.push_back(reaction()); 
