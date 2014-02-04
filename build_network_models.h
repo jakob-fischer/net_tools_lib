@@ -4,6 +4,207 @@
 #include "reaction_network.h"
 
 
+void build_model_2box_cli_H2O_C(std::vector<species> &sp, std::vector<reaction> &re) {
+    sp.push_back(species(sp.size(), "T_sun"));
+    size_t iT_sun=0;
+    sp.push_back(species(sp.size(), "T_space"));
+    size_t iT_space=1;
+    sp.push_back(species(sp.size(), "T_sun_d"));
+    size_t iT_sun_d=2;
+    sp.push_back(species(sp.size(), "T_sun_d_1"));
+    size_t iT_sun_d_1=3;
+    sp.push_back(species(sp.size(), "T_sun_d_2"));
+    size_t iT_sun_d_2=4;
+    sp.push_back(species(sp.size(), "T_surf_1"));
+    size_t iT_surf_1=5;
+    sp.push_back(species(sp.size(), "T_surf_2"));
+    size_t iT_surf_2=6;
+    sp.push_back(species(sp.size(), "T_atm_1"));
+    size_t iT_atm_1=7;
+    sp.push_back(species(sp.size(), "T_atm_2"));
+    size_t iT_atm_2=8;
+    sp.push_back(species(sp.size(), "H2O_atm_1"));
+    size_t iH2O_atm_1=9;
+    sp.push_back(species(sp.size(), "H2O_atm_2"));
+    size_t iH2O_atm_2=10;
+    sp.push_back(species(sp.size(), "H2O_surf_1"));
+    size_t iH2O_surf_1=11;
+    sp.push_back(species(sp.size(), "H2O_surf_2"));
+    size_t iH2O_surf_2=12;
+    sp.push_back(species(sp.size(), "CO2"));
+    size_t iCO2=13;
+    sp.push_back(species(sp.size(), "C_plant"));
+    size_t iC_plant=14;
+    sp.push_back(species(sp.size(), "C_soil"));
+    size_t iC_soil=15;
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_sun, 1);
+    re.back().add_product(iT_sun_d, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_sun_d, 1);
+    re.back().add_product(iT_sun_d_1, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_sun_d, 1);
+    re.back().add_product(iT_sun_d_2, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_sun_d_1, 1);
+    re.back().add_product(iT_space, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_sun_d_2, 1);
+    re.back().add_product(iT_space, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_sun_d_1, 1);
+    re.back().add_product(iT_surf_1, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_sun_d_2, 1);
+    re.back().add_product(iT_surf_2, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_surf_1, 1);
+    re.back().add_product(iT_atm_1, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_surf_2, 1);
+    re.back().add_product(iT_atm_2, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_atm_1, 1);
+    re.back().add_product(iT_space, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_atm_2, 1);
+    re.back().add_product(iT_space, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iH2O_surf_1, 1);
+    re.back().add_educt(iT_surf_1, 1);
+    re.back().add_product(iH2O_atm_1, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iH2O_surf_2, 1);
+    re.back().add_educt(iT_surf_2, 1);
+    re.back().add_product(iH2O_atm_2, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iH2O_atm_1, 1);
+    re.back().add_product(iH2O_surf_1, 1);
+    re.back().add_product(iT_atm_1, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iH2O_atm_2, 1);
+    re.back().add_product(iH2O_surf_2, 1);
+    re.back().add_product(iT_atm_2, 1);
+
+
+    re.push_back(reaction());
+    re.back().add_educt(iCO2, 1);
+    re.back().add_educt(iT_sun_d_1, 1);
+    re.back().add_product(iC_plant, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iC_plant, 1);
+    re.back().add_product(iC_soil, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iC_plant, 1);
+    re.back().add_product(iCO2, 1);
+    re.back().add_product(iT_surf_1, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iC_soil, 1);
+    re.back().add_product(iCO2, 1);
+    re.back().add_product(iT_surf_1, 1);
+
+
+    re.push_back(reaction());
+    re.back().add_educt(iH2O_surf_1, 1);
+    re.back().add_product(iH2O_surf_2, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iH2O_atm_2, 1);
+    re.back().add_product(iH2O_atm_1, 1);
+
+    //re.push_back(reaction());
+    //re.back().add_educt(iT_atm_2, 1);
+    //re.back().add_product(iT_atm_1, 1);
+}
+
+
+
+void build_model_carbon3way(std::vector<species> &sp, std::vector<reaction> &re) {
+    sp.push_back(species(sp.size(), "T_sun"));
+    size_t iT_sun=0;
+    sp.push_back(species(sp.size(), "T_s_down"));
+    size_t iT_s_down=1;
+    sp.push_back(species(sp.size(), "T_space"));
+    size_t iT_space=2;
+    sp.push_back(species(sp.size(), "T_surf"));
+    size_t iT_surf=3;
+    sp.push_back(species(sp.size(), "CO2"));
+    size_t iCO2=4;
+    sp.push_back(species(sp.size(), "C_plant"));
+    size_t iC_plant=5;
+    sp.push_back(species(sp.size(), "C_soil"));
+    size_t iC_soil=6;
+    sp.push_back(species(sp.size(), "C_fossil"));
+    size_t iC_fossil=7;
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_sun, 1);
+    re.back().add_product(iT_s_down, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_s_down, 1);
+    re.back().add_product(iT_space, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_s_down, 1);
+    re.back().add_product(iT_surf, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_surf, 1);
+    re.back().add_product(iT_space, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iT_s_down, 1);
+    re.back().add_educt(iCO2, 1);
+    re.back().add_product(iC_plant, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iC_plant, 1);
+    re.back().add_product(iCO2, 1);
+    re.back().add_product(iT_surf, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iC_plant, 1);
+    re.back().add_product(iC_soil, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iC_soil, 1);
+    re.back().add_product(iCO2, 1);
+    re.back().add_product(iT_surf, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iC_soil, 1);
+    re.back().add_product(iC_fossil, 1);
+
+    re.push_back(reaction());
+    re.back().add_educt(iC_fossil, 1);
+    re.back().add_product(iCO2, 1);
+    re.back().add_product(iT_surf, 1);
+}
+
+
+
+
+
 void build_model_2box_cli_rad(std::vector<species> &sp, std::vector<reaction> &re) {
     sp.push_back(species(sp.size(), "T_sun"));
     size_t iT_sun=0;
@@ -79,6 +280,10 @@ void build_model_1box_cli_hyd(std::vector<species> &sp, std::vector<reaction> &r
     re.back().add_product(iT_surf, 1);
 
     re.push_back(reaction()); 
+    re.back().add_educt(iT_surf, 1);
+    re.back().add_product(iT_atm, 1);
+
+    re.push_back(reaction()); 
     re.back().add_educt(iT_atm, 1);
     re.back().add_product(iT_space, 1);
 
@@ -93,8 +298,8 @@ void build_model_1box_cli_hyd(std::vector<species> &sp, std::vector<reaction> &r
     re.back().add_product(iH2O_atm, 1);
 
     re.push_back(reaction()); 
-    re.back().add_educt(iT_atm, 1);
-    re.back().add_product(iT_space, 1);
+    re.back().add_educt(iH2O_atm, 1);
+    re.back().add_product(iH2O_surf, 1);
 }
 
 
@@ -7833,6 +8038,1672 @@ void build_model_Krasnopolsky_2012(std::vector<species> &sp, std::vector<reactio
 	re.back().add_product(iO2, 1);
     re.back().add_product(iH2O, 1);
 }
+
+void build_model_Kasting_220(std::vector<species> &sp, std::vector<reaction> &re) {
+    sp.push_back(species(sp.size(), "hv"));
+    size_t ihv=0; 
+    sp.push_back(species(sp.size(), "O"));
+    size_t iO=1; 
+    sp.push_back(species(sp.size(), "O1D"));
+    size_t iO1D=2; 
+    sp.push_back(species(sp.size(), "O2"));
+    size_t iO2=3; 
+    sp.push_back(species(sp.size(), "O3"));
+    size_t iO3=4; 
+    sp.push_back(species(sp.size(), "H"));
+    size_t iH=5; 
+    sp.push_back(species(sp.size(), "H2"));
+    size_t iH2=6; 
+    sp.push_back(species(sp.size(), "H2O"));
+    size_t iH2O=7; 
+    sp.push_back(species(sp.size(), "H2O2"));
+    size_t iH2O2=8; 
+    sp.push_back(species(sp.size(), "OH"));
+    size_t iOH=9;
+    sp.push_back(species(sp.size(), "M"));
+    size_t iM=10;  
+    sp.push_back(species(sp.size(), "HO2"));
+    size_t iHO2=11; 
+    sp.push_back(species(sp.size(), "N2"));
+    size_t iN2=12; 
+    sp.push_back(species(sp.size(), "O3P"));
+    size_t iO3P=13; 
+    sp.push_back(species(sp.size(), "CO2"));
+    size_t iCO2=14; 
+    sp.push_back(species(sp.size(), "CO"));
+    size_t iCO=15; 
+    sp.push_back(species(sp.size(), "H2CO"));
+    size_t iH2CO=16; 
+    sp.push_back(species(sp.size(), "CH4"));
+    size_t iCH4=17; 
+    sp.push_back(species(sp.size(), "1CH2"));
+    size_t i1CH2=18; 
+    sp.push_back(species(sp.size(), "H3CO"));
+    size_t iH3CO=19; 
+    sp.push_back(species(sp.size(), "HCO"));
+    size_t iHCO=20; 
+    sp.push_back(species(sp.size(), "N2O"));
+    size_t iN2O=21; 
+    sp.push_back(species(sp.size(), "CH3"));
+    size_t iCH3=22; 
+    sp.push_back(species(sp.size(), "N"));
+    size_t iN=23; 
+    sp.push_back(species(sp.size(), "NO"));
+    size_t iNO=24; 
+    sp.push_back(species(sp.size(), "NO2"));
+    size_t iNO2=25; 
+    sp.push_back(species(sp.size(), "CH3OOH"));
+    size_t iCH3OOH=26; 
+    sp.push_back(species(sp.size(), "HNO3"));
+    size_t iHNO3=27; 
+    sp.push_back(species(sp.size(), "HNO2"));
+    size_t iHNO2=28; 
+    sp.push_back(species(sp.size(), "HO2NO2"));
+    size_t iHO2NO2=29; 
+    sp.push_back(species(sp.size(), "HOCl"));
+    size_t iHOCl=30; 
+    sp.push_back(species(sp.size(), "Cl2"));
+    size_t iCl2=31; 
+    sp.push_back(species(sp.size(), "ClO2"));
+    size_t iClO2=32; 
+    sp.push_back(species(sp.size(), "Cl2O2"));
+    size_t iCl2O2=33; 
+    sp.push_back(species(sp.size(), "ClO"));
+    size_t iClO=34; 
+    sp.push_back(species(sp.size(), "HCl"));
+    size_t iHCl=35; 
+    sp.push_back(species(sp.size(), "NO3"));
+    size_t iNO3=36; 
+    sp.push_back(species(sp.size(), "3CH2"));
+    size_t i3CH2=37; 
+    sp.push_back(species(sp.size(), "S"));
+    size_t iS=38; 
+    sp.push_back(species(sp.size(), "S2"));
+    size_t iS2=39; 
+    sp.push_back(species(sp.size(), "SO"));
+    size_t iSO=40;
+    sp.push_back(species(sp.size(), "CH3O2"));
+    size_t iCH3O2=41; 
+    sp.push_back(species(sp.size(), "Cl"));
+    size_t iCl=42; 
+    sp.push_back(species(sp.size(), "CH3Cl"));
+    size_t iCH3Cl=43; 
+    sp.push_back(species(sp.size(), "NOCl"));
+    size_t iNOCl=44; 
+    sp.push_back(species(sp.size(), "H2S"));
+    size_t iH2S=45; 
+    sp.push_back(species(sp.size(), "SO2"));
+    size_t iSO2=46; 
+    sp.push_back(species(sp.size(), "SO3"));
+    size_t iSO3=47; 
+    sp.push_back(species(sp.size(), "N2O5"));
+    size_t iN2O5=48; 
+    sp.push_back(species(sp.size(), "HS"));
+    size_t iHS=49;  
+    sp.push_back(species(sp.size(), "HSO3"));
+    size_t iHSO3=50; 
+    sp.push_back(species(sp.size(), "H2SO4"));
+    size_t iH2SO4=51; 
+    sp.push_back(species(sp.size(), "ClONO2"));
+    size_t iClONO2=52; 
+    sp.push_back(species(sp.size(), "ClONO"));
+    size_t iClONO=53; 
+    sp.push_back(species(sp.size(), "HSO"));
+    size_t iHSO=54; 
+    sp.push_back(species(sp.size(), "SO2_1"));
+    size_t iSO2_1=55; 
+    sp.push_back(species(sp.size(), "SO2_3"));
+    size_t iSO2_3=56; 
+
+
+    // R1   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2O, 1);
+    re.back().add_educt(iO1D, 1);
+    re.back().add_product(iOH, 2);
+
+    // R2   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2, 1);
+    re.back().add_educt(iO1D, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iH, 1);
+
+    // R3   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iH, 1);
+    
+    // R4   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iH, 1);
+
+    // R5   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iO2, 1);
+
+    // R6   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iHO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R7   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iH2, 1);
+    re.back().add_product(iO2, 1);
+
+    // R8   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iO, 1);
+
+    // R9   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iOH, 2);
+
+    // R10   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iOH, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iH, 1);
+    re.back().add_product(iO2, 1);
+
+    // R11   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iOH, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iO2, 1);
+
+    // R12    C
+    re.push_back(reaction()); 
+    re.back().add_educt(iOH, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iHO2, 1);
+    re.back().add_product(iO2, 1);
+
+    // R13   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iO2, 1);
+
+    // R14   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iO2, 2);
+
+    // R15   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2, 2);
+    re.back().add_product(iH2O2, 1);
+    re.back().add_product(iO2, 1);
+
+    // R16   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2O2, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iHO2, 1);
+    re.back().add_product(iH2O, 1);
+
+    // R17   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO, 2);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R18   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iO3, 1);
+    re.back().add_product(iM, 1);
+
+    // R19   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iO2, 2);
+
+    // R20   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iOH, 2);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iO, 1);
+
+    // R21   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO1D, 1);
+    re.back().add_educt(iN2, 1);
+    re.back().add_product(iO3P, 1);
+    re.back().add_product(iN2, 1);
+
+    // R22   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO1D, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iO3P, 1);
+    re.back().add_product(iO2, 1);
+
+    // R23   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iO3P, 1);
+    re.back().add_product(iO1D, 1);
+
+    // R24   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iO3P, 2);
+
+    // R25   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2O, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iH, 1);
+    re.back().add_product(iOH, 1);
+
+    // R26   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO3, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iO2, 1);
+    re.back().add_product(iO1D, 1);
+
+    // R27   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO3, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iO2, 1);
+    re.back().add_product(iO3P, 1);
+
+    // R28   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2O2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iOH, 2);
+
+    // R29   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iCO, 1);
+    re.back().add_product(iO3P, 1);
+
+    // R30   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCO, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iCO2, 1);
+    re.back().add_product(iH, 1);
+
+    // R31   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCO, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iCO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R32   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iCO, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iHCO, 1);
+    re.back().add_product(iM, 1);
+
+    // R33   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iHCO, 1);
+    re.back().add_product(iH2, 1);
+    re.back().add_product(iCO, 1);
+
+    // R34   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHCO, 2);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iCO, 1);
+
+    // R35   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iOH, 1);
+    re.back().add_educt(iHCO, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iCO, 1);
+
+    // R36   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO, 1);
+    re.back().add_educt(iHCO, 1);
+    re.back().add_product(iH, 1);
+    re.back().add_product(iCO2, 1);
+
+    // R37   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO, 1);
+    re.back().add_educt(iHCO, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iCO, 1);
+
+    // R38   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2CO, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iH2, 1);
+    re.back().add_product(iCO, 1);
+
+    // R39   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2CO, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iHCO, 1);
+    re.back().add_product(iH, 1);
+
+    // R40   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHCO, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iH, 1);
+    re.back().add_product(iCO, 1);
+
+    // R41   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2CO, 1);
+    re.back().add_educt(iH, 1);
+    re.back().add_product(iH2, 1);
+    re.back().add_product(iHCO, 1);
+
+    // R42   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iCO, 1);
+    re.back().add_product(iO1D, 1);
+
+    // R43   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 2);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iH2, 1);
+    re.back().add_product(iM, 1);
+
+    // R44   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHCO, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iHO2, 1);
+    re.back().add_product(iCO, 1);
+
+    // R45   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2CO, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iHCO, 1);
+
+
+    // R46   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iM, 1);
+
+    // R47   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iOH, 2);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iH2O2, 1);
+    re.back().add_product(iM, 1);
+
+    // R48   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2CO, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iHCO, 1);
+    re.back().add_product(iOH, 1);
+
+    // R49   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2O2, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iHO2, 1);
+
+    // R50   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iO, 1);
+
+    // R51   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH4, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(i1CH2, 1);
+    re.back().add_product(iH2, 1);
+
+    // R52   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3OOH, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iH3CO, 1);
+    re.back().add_product(iOH, 1);
+
+    // R53   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN2O, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iN2, 1);
+    re.back().add_product(iO, 1);
+
+    // R54   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHNO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iNO, 1);
+    re.back().add_product(iOH, 1);
+
+    // R55   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHNO3, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iOH, 1);
+
+    // R56   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iN, 1);
+    re.back().add_product(iO, 1);
+
+    // R57   C  
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iNO, 1);
+    re.back().add_product(iO, 1);
+
+    // R58   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH4, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iCH3, 1);
+    re.back().add_product(iH2O, 1);
+
+    // R59   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH4, 1);
+    re.back().add_educt(iO1D, 1);
+    re.back().add_product(iCH3, 1);
+    re.back().add_product(iOH, 1);
+
+    // R60   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH4, 1);
+    re.back().add_educt(iO1D, 1);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iH2, 1);
+
+    // R61   C
+    re.push_back(reaction()); 
+    re.back().add_educt(i1CH2, 1);
+    re.back().add_educt(iCH4, 1);
+    re.back().add_product(iCH3, 2);
+
+    // R62   C
+    re.push_back(reaction()); 
+    re.back().add_educt(i1CH2, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iO, 1);
+
+    // R63   C
+    re.push_back(reaction()); 
+    re.back().add_educt(i1CH2, 1);
+    re.back().add_educt(iN2, 1);
+    re.back().add_product(i3CH2, 1);
+    re.back().add_product(iN2, 1);
+
+    // R64   C
+    re.push_back(reaction()); 
+    re.back().add_educt(i3CH2, 1);
+    re.back().add_educt(iH2, 1);
+    re.back().add_product(iCH3, 1);
+    re.back().add_product(iH, 1);
+
+    // R65   C
+    re.push_back(reaction()); 
+    re.back().add_educt(i3CH2, 1);
+    re.back().add_educt(iCH4, 1);
+    re.back().add_product(iCH3, 2);
+
+    // R66   C
+    re.push_back(reaction()); 
+    re.back().add_educt(i3CH2, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iO, 1);
+
+    // R67   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iCH3O2, 1);
+    re.back().add_product(iM, 1);
+
+    // R68   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iH2, 1);
+
+    // R69   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iH, 1);
+
+    // R70   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iHO2, 1);
+
+    // R71   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3O2, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iCH3OOH, 1);
+    re.back().add_product(iO2, 1);
+
+    // R72   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3O2, 2);
+    re.back().add_product(iH3CO, 2);
+    re.back().add_product(iO2, 1);
+
+    // R73   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3O2, 1);
+    re.back().add_educt(iNO, 1);
+    re.back().add_product(iH3CO, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R74   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH3CO, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iHO2, 1);
+
+    // R75   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH3CO, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iOH, 1);
+
+    // R76   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH3CO, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iH2CO, 1);
+    re.back().add_product(iH2O, 1);
+
+    // R77   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN2O, 1);
+    re.back().add_educt(iO1D, 1);
+    re.back().add_product(iNO, 2);
+
+    // R78   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN2O, 1);
+    re.back().add_educt(iO1D, 1);
+    re.back().add_product(iN2, 1);
+    re.back().add_product(iO2, 1);
+
+    // R79   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iNO, 1);
+    re.back().add_product(iO, 1);
+
+    // R80   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iNO, 1);
+    re.back().add_product(iO2, 1);
+
+    // R81   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iNO, 1);
+    re.back().add_product(iH, 1);
+
+    // R82   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN, 1);
+    re.back().add_educt(iNO, 1);
+    re.back().add_product(iN2, 1);
+    re.back().add_product(iO, 1);
+
+    // R83   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iO2, 1);
+
+    // R84   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R85   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iOH, 1);
+
+    // R86   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iHNO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R87   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iNO, 1);
+    re.back().add_product(iO2, 1);
+
+    // R88   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iHNO3, 1);
+    re.back().add_product(iM, 1);
+
+    // R89   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(iH, 1);
+    re.back().add_product(iNO, 1);
+    re.back().add_product(iOH, 1);
+
+    // R90   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHNO3, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iNO3, 1);
+
+    // R91   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2, 1);
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iHO2NO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R92   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2NO2, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iO2, 1);
+
+    // R93   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2NO2, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iO2, 1);
+
+    // R94   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2NO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iHO2, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R95   C 
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2NO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iHO2, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R96   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3OOH, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iCH3O2, 1);
+    re.back().add_product(iH2O, 1);
+
+    // R97   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3O2, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iH3CO, 1);
+    re.back().add_product(iHO2, 1);
+
+    // R98   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO3, 1);
+    re.back().add_educt(iNO2, 1);
+    re.back().add_product(iO2, 1);
+    re.back().add_product(iNO3, 1);
+
+    // R99   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(iNO3, 1);
+    re.back().add_product(iNO, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iO2, 1);
+
+    // R100   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iO, 1);
+    re.back().add_educt(iNO3, 1);
+    re.back().add_product(iO2, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R101   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3Cl, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iCH3, 1);
+    re.back().add_product(iCl, 1);
+
+    // R102   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO, 1);
+    re.back().add_educt(iNO3, 1);
+    re.back().add_product(iNO2, 2);
+
+    // R103   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iOH, 1);
+    re.back().add_educt(iNO3, 1);
+    re.back().add_product(iHO2, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R104   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCH3Cl, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(i1CH2, 1);   // EXTENDED
+
+    // R105   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iClO, 1);
+    re.back().add_product(iO2, 1);
+
+    // R106   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iH2, 1);
+    re.back().add_product(iHCl, 1);
+    re.back().add_product(iH, 1);
+
+    // R107   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iCH4, 1);
+    re.back().add_product(iHCl, 1);
+    re.back().add_product(iCH3, 1);
+
+    // R108   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iCH3Cl, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iHCl, 1);
+    re.back().add_product(i1CH2, 1);
+
+    // R109   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iH2CO, 1);
+    re.back().add_product(iHCl, 1);
+    re.back().add_product(iHCO, 1);
+
+    // R110   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iH2O2, 1);
+    re.back().add_product(iHCl, 1);
+    re.back().add_product(iHO2, 1);
+
+    // R111   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iHCl, 1);
+    re.back().add_product(iO2, 1);
+
+    // R112   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iClO, 1);
+    re.back().add_product(iOH, 1);
+
+    // R113   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iClONO2, 1);
+    re.back().add_product(iCl, 2);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iO, 1);
+
+    // R114   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iNO, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iNOCl, 1);
+    re.back().add_product(iM, 1);
+
+    // R115   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iClONO, 1);
+    re.back().add_product(iM, 1);
+
+    // R116   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iNOCl, 1);
+    re.back().add_product(iNO, 1);
+    re.back().add_product(iCl2, 1);
+
+    // R117   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iClO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R118   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iClO2, 1);
+    re.back().add_product(iCl2, 1);
+    re.back().add_product(iO2, 1);
+
+    // R119   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iClO2, 1);
+    re.back().add_product(iClO, 2);
+
+    // R120   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iO2, 1);
+
+    // R121   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO, 1);
+    re.back().add_educt(iNO, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R122   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO, 1);
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iClONO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R123   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iHOCl, 1);
+    re.back().add_product(iO2, 1);
+
+    // R124   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iHO2, 1);
+
+    // R125   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHCl, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iH2O, 1);
+
+    // R126   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHOCl, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iClO, 1);
+    re.back().add_product(iH2O, 1);
+
+    // R127   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClONO2, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iHO2, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R128   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHCl, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iOH, 1);
+
+    // R129   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHOCl, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iClO, 1);
+    re.back().add_product(iOH, 1);
+
+    // R130   C 
+    re.push_back(reaction()); 
+    re.back().add_educt(iClONO2, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iO2, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R131   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl2, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iHOCl, 1);
+    re.back().add_product(iCl, 1);
+
+    // R132   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iCl, 2);
+
+    // R133   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iClO, 1);
+    re.back().add_product(iO, 1);
+
+    // R134   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHCl, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iH, 1);
+    re.back().add_product(iCl, 1);
+
+    // R135    C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHOCl, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iCl, 1);
+
+    // R136   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNOCl, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iNO, 1);
+
+    // R137   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClONO, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R138   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClONO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iNO3, 1);
+
+    // R139   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iO2, 1);
+
+    // R140   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHO2, 1);
+    re.back().add_educt(iNO3, 1);
+    re.back().add_product(iHNO3, 1);
+    re.back().add_product(iO2, 1);
+
+    // R141   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO, 2);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iCl2O2, 1);
+    re.back().add_product(iM, 1);
+
+    // R142   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl2O2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iClO2, 1);
+    re.back().add_product(iCl, 1);
+
+    // R143   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl2O2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iClO, 2);
+    re.back().add_product(iM, 1);
+
+    // R144   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iCl, 1);
+    re.back().add_product(iO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R145   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iNO3, 1);
+    re.back().add_product(iClO, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R146   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iCl, 1);
+    re.back().add_educt(iHOCl, 1);
+    re.back().add_product(iCl2, 1);
+    re.back().add_product(iOH, 1);
+
+    // R147   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO, 1);
+    re.back().add_educt(iNO3, 1);
+    re.back().add_product(iClONO, 1);
+    re.back().add_product(iO2, 1);
+
+    // R148   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClONO, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iHOCl, 1);
+    re.back().add_product(iNO2, 1);
+
+    // R149   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iClO2, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iClO, 1);
+    re.back().add_product(iO2, 1);
+
+    // R150   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iNO3, 1);
+    re.back().add_product(iM, 1);
+
+    // R151   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO3, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iO, 1);
+
+    // R152   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iNO3, 1);
+    re.back().add_educt(iNO2, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iN2O5, 1);
+    re.back().add_product(iM, 1);
+
+    // R153   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN2O5, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iNO3, 1);
+
+    // R154   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN2O5, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iNO3, 1);
+    re.back().add_product(iM, 1);
+
+    // R155   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN2O5, 1);
+    re.back().add_educt(iH2O, 1);
+    re.back().add_product(iHNO3, 2);
+
+    //return;
+
+    // R156   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iS, 1);
+    re.back().add_product(iO, 1);
+
+    // R157   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iSO, 1);
+    re.back().add_product(iO, 1);
+
+    // R158   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2S, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iHS, 1);
+    re.back().add_product(iH, 1);
+
+    // R159   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iO, 1);
+    re.back().add_product(iSO2, 1);
+
+    // R160   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(iOH, 1);
+
+    // R161   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iSO2, 1);
+
+    // R162   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(iH, 1);
+
+    // R163   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iHSO3, 1);
+
+    // R164   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iSO3, 1);
+
+    // R165   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO3, 1);
+    re.back().add_educt(iH2O, 1);
+    re.back().add_product(iH2SO4, 1);
+
+    // R166   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO3, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iHO2, 1);
+    re.back().add_product(iSO3, 1);
+
+    // R167   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO3, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iSO3, 1);
+
+    // R168   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO3, 1);
+    re.back().add_educt(iH, 1);
+    re.back().add_product(iH2, 1);
+    re.back().add_product(iSO3, 1);
+
+    // R169   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO3, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iSO3, 1);
+
+    // R170   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2S, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iHS, 1);
+
+    //return;
+
+    // R171   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2S, 1);
+    re.back().add_educt(iH, 1);
+    re.back().add_product(iH2, 1);
+    re.back().add_product(iHS, 1);
+
+    // R172   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2S, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iHS, 1);
+
+    // R173   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iH, 1);
+    re.back().add_product(iSO, 1);
+
+    // R174   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iSO, 1);
+
+    // R175   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iH2S, 1);
+    re.back().add_product(iO2, 1);
+
+    // R176   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 2);
+    re.back().add_product(iH2S, 1);
+    re.back().add_product(iS, 1);
+
+    // R177   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 1);
+    re.back().add_educt(iHCO, 1);
+    re.back().add_product(iH2S, 1);
+    re.back().add_product(iCO, 1);
+
+    // R178   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 1);
+    re.back().add_educt(iH, 1);
+    re.back().add_product(iH2, 1);
+    re.back().add_product(iS, 1);
+
+    // R179   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 1);
+    re.back().add_educt(iS, 1);
+    re.back().add_product(iH, 1);
+    re.back().add_product(iS2, 1);
+
+    // R180   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iS, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iSO, 1);
+    re.back().add_product(iO, 1);
+
+    // R181   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iS, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iSO, 1);
+    re.back().add_product(iH, 1);
+
+    // R182a)   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iS, 1);
+    re.back().add_product(iO2, 1);
+
+    // R183   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iS, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iHS, 1);
+    re.back().add_product(iO2, 1);
+
+    // R184   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iS, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iSO, 1);
+    re.back().add_product(iOH, 1);
+
+    // R185   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 1);
+    re.back().add_educt(iH2CO, 1);
+    re.back().add_product(iH2S, 1);
+    re.back().add_product(iHCO, 1);
+
+    // R186   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iSO2_1, 1);
+
+    // R187   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iSO2_3, 1);
+
+    // R188   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH2SO4, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(iOH, 2);
+
+    // R189   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO3, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(iO, 1);
+
+    // R190   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2_1, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iSO2_3, 1);
+    re.back().add_product(iM, 1);
+
+    // R191   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2_1, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R192   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2_1, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iSO2_3, 1);
+    re.back().add_product(ihv, 1);
+
+    // R193   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2_1, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(ihv, 1);
+
+    // R194   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2_1, 1);
+    re.back().add_educt(iO2, 1);
+    re.back().add_product(iSO3, 1);
+    re.back().add_product(iO, 1);
+
+    // R195   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2_1, 1);
+    re.back().add_educt(iSO2, 1);
+    re.back().add_product(iSO3, 1);
+    re.back().add_product(iSO, 1);
+
+    // R196   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2_3, 1);
+    re.back().add_educt(iM, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(iM, 1);
+
+    // R197   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2_3, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(ihv, 1);
+
+    // R198   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2_3, 1);
+    re.back().add_educt(iSO2, 1);
+    re.back().add_product(iSO3, 1);
+    re.back().add_product(iSO, 1);
+
+    // R199   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 1);
+    re.back().add_educt(iNO2, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(iNO, 1);
+
+    // R200    C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(iO2, 1);
+
+    // R201   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO2, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iSO3, 1);
+    re.back().add_product(iOH, 1);
+
+    // R202   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iHSO, 1);
+    re.back().add_product(iO2, 1);
+
+    // R203   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHS, 1);
+    re.back().add_educt(iNO2, 1);
+    re.back().add_product(iHSO, 1);
+    re.back().add_product(iNO, 1);
+
+    // R204   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iS, 1);
+    re.back().add_educt(iO3, 1);
+    re.back().add_product(iSO, 1);
+    re.back().add_product(iO2, 1);
+
+    // R205   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 2);
+    re.back().add_product(iSO2, 1);
+    re.back().add_product(iS, 1);
+
+    // R206   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO3, 1);
+    re.back().add_educt(iSO, 1);
+    re.back().add_product(iSO2, 2);
+
+    // R207   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iS, 1);
+    re.back().add_educt(iCO2, 1);
+    re.back().add_product(iSO, 1);
+    re.back().add_product(iCO, 1);
+
+    // R208   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 1);
+    re.back().add_educt(iHO2, 1);
+    re.back().add_product(iHSO, 1);
+    re.back().add_product(iO2, 1);
+
+    // R209   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iSO, 1);
+    re.back().add_educt(iHCO, 1);
+    re.back().add_product(iHSO, 1);
+    re.back().add_product(iCO, 1);
+
+    // R210   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iSO, 1);
+    re.back().add_product(iHSO, 1);
+
+    // R211   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO, 1);
+    re.back().add_educt(ihv, 1);
+    re.back().add_product(iHS, 1);
+    re.back().add_product(iO, 1);
+
+    // R212   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO, 1);
+    re.back().add_educt(iOH, 1);
+    re.back().add_product(iH2O, 1);
+    re.back().add_product(iSO, 1);
+
+    // R213   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO, 1);
+    re.back().add_educt(iH, 1);
+    re.back().add_product(iHS, 1);
+    re.back().add_product(iOH, 1);
+
+    // R214  C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO, 1);
+    re.back().add_educt(iH, 1);
+    re.back().add_product(iH2, 1);
+    re.back().add_product(iSO, 1);
+
+    // R215   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO, 1);
+    re.back().add_educt(iHS, 1);
+    re.back().add_product(iH2S, 1);
+    re.back().add_product(iSO, 1);
+
+    // R216   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO, 1);
+    re.back().add_educt(iO, 1);
+    re.back().add_product(iOH, 1);
+    re.back().add_product(iSO, 1);
+
+    // R217   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iHSO, 1);
+    re.back().add_educt(iS, 1);
+    re.back().add_product(iHS, 1);
+    re.back().add_product(iSO, 1);
+
+    // R218   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN2, 1);
+    re.back().add_educt(iO1D, 1);
+    re.back().add_product(iN2O, 1);
+
+    // R219   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN2O, 1);
+    re.back().add_educt(iH, 1);
+    re.back().add_educt(iO2, 1);      // added
+    re.back().add_product(iNO, 2);
+    re.back().add_product(iOH, 1);
+
+    // R220   C
+    re.push_back(reaction()); 
+    re.back().add_educt(iN2O, 1);
+    re.back().add_educt(iNO, 1);
+    re.back().add_product(iNO2, 1);
+    re.back().add_product(iN2, 1);
+}
+
+
 
 
 void build_model_Kasting_1985(std::vector<species> &sp, std::vector<reaction> &re) {
