@@ -646,6 +646,61 @@ class reaction {
        
        return *this;
     }
+
+
+    /*
+     *
+     */
+  
+    double calculate_rate_f(double Ea, const std::vector<double>& species_E, bool logscale) {
+        if(logscale) {
+            double Ee=1;
+
+            for(size_t i=0; i<educts.size(); ++i)
+                Ee *= pow(species_E[educts[i].first], educts[i].second);           
+
+            return Ee/Ea;
+        } else { 
+            double Ee=0;
+
+            for(size_t i=0; i<educts.size(); ++i)
+                Ee += species_E[educts[i].first]*educts[i].second;
+
+            return exp(-(Ea-Ee));
+        }
+    }
+
+
+    /*
+     *
+     */
+
+    double calculate_rate_b(double Ea, const std::vector<double>& species_E, bool logscale) {
+        if(logscale) {
+            double Ep=1;
+
+            for(size_t i=0; i<products.size(); ++i)
+                Ep *= pow(species_E[products[i].first], products[i].second);           
+
+            return Ep/Ea;
+        } else { 
+            double Ep=0;
+
+            for(size_t i=0; i<products.size(); ++i)
+                Ep += species_E[products[i].first]*products[i].second;
+
+            return exp(-(Ea-Ep));
+        }
+    }
+
+
+    /*
+     * 
+     */
+
+     double calculate_rate(double Ea, const std::vector<double>& species_E, bool logscale) {
+         return (calculate_rate_f(Ea, species_E, logscale) - calculate_rate_b(Ea, species_E, logscale));
+     }
     
     
     /*
