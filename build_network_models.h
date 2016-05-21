@@ -2,7 +2,9 @@
  * date: 15th April 2014
  * description: 
  * Code to create files containing topological information on different types of complex networks
- * This is ugly / but historically grown :-/
+ * This is ugly / historically grown. To solve this one should execute this once and include the
+ * networks as "sample_networks" in jrnf-file format in the same repository (and remove all the 
+ * code here and in 'jrnf_tools'-repository).
  */
 
 #ifndef BUILD_NETWORKS_MODELS_H
