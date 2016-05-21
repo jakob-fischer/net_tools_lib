@@ -348,9 +348,7 @@ class reaction {
     // Vector containing educts and products of the network
     std::vector< std::pair<size_t,double> > educts, products;
   
-  
   public:
-  
   
     /*
      * Standard c. Constants are set 1.0, a. e. 0, and reaction irrevers.
@@ -918,18 +916,6 @@ class reaction {
     
     // Friend declaration of input function / operator
     friend std::istream& operator>>(std::istream& is, reaction& re);
-    
-    // Dummy function for input of data from the Book of Yung-DeMore
-    void photodiss(double a, double b, double c) {}
-    
-    // Dummy function for input of data from the Book of Yung-DeMore
-    void sorder(double a, double b, double c, double d, double e)  {}
-    
-    // Dummy function for input of data from the Book of Yung-DeMore
-    void assrea(double a, double b, double c, double d) {}
-    
-    // Dummy function for input of data from the Book of Yung-DeMore
-    void eqrea(double a, double b, double c, double d) {}
 };
 
 
