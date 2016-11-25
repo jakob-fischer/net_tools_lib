@@ -965,8 +965,6 @@ std::istream& operator>>(std::istream& is, reaction& re) {
 /*
  * Function for merging two reaction networks
  *
- * TODO add function for removing reaction duplicates
- *         -> done, but has to be tested
  */
 
 void combine_r_networks(std::vector<species> &sp_1, std::vector<reaction> &re_1, 
@@ -1050,6 +1048,7 @@ void filter_r_network(std::vector<species> &sp_in, std::vector<reaction> &re_in,
     	    re.erase(re.begin()+i);
     }
 }
+
 
 /*
  * Function copys a reaction network while removing all reactions that

@@ -1,1 +1,24 @@
 TODO
+
+atmospheric reaction networks:
+=============================
+jung_1999.jrnf (+ yung_1999_data.dat)
+-------------------------------------
+Reaction network of Earth's atmosphere (and related dataset):
+source: Yung YL, DeMore WB (1998) Photochemistry of Planetary Atmospheres. 
+        New York: Oxford University Press.
+
+duncan_chameides.jrnf
+---------------------
+Ozone reaction network:
+source: Duncan BN, Chameides WL (1998) Effects of urban emission control
+        strategies on the export of ozone and ozone precursors from the urban
+        atmosphere to the troposphere, J of Geophys Res
+
+
+
+
+simple test networks:
+====================
+test.jrnf, test2.jrnf, test3.jrnf, carbon3way.jrnf, onebox_cli_hyd.jrnf, 
+twobox_cli_H2O_C.jrnf, twobox_cli_hyd.jrnf, twobox_cli_rad.jrnf
