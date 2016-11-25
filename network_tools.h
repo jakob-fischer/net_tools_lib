@@ -171,20 +171,6 @@ public:
 	for(size_t i=0; i<ref.probs[0].size(); ++i)
 	    add(ref.probs[0][i]);
     }
-
-
-
-
-     void printout() {
-       for(size_t i=0; i<=last; ++i) {
-           std::cout << i << " : ";
-           for(size_t j=0; j<probs[i].size(); ++j)
-               std::cout << probs[i][j] << " / ";
-
-           std::cout << std::endl;
-       }
-
-     }
 };
 
 
@@ -809,6 +795,14 @@ void couple_erdos_renyi(std::vector< std::pair<size_t, size_t> > &couples,
 }
 
 
+// Macro helper to determine "distance" 
+size_t cws_links_cy_dist(int a, int b, size_t N) {
+    size_t a_amb = std::abs(a-b);
+    size_t a_amb2 = std::abs(N-a_amb);
+
+    return std::min(a_amb, a_amb2);
+}
+
 
 /*
  * For a Watts-Strogatz-Network this function this function selects edges to 
@@ -826,18 +820,7 @@ void couple_erdos_renyi(std::vector< std::pair<size_t, size_t> > &couples,
  * allow_multiple  - the same link can occur multiple times
  * self_loop       - self loops are allowed
  * directed        - directed network is created
- *
- * TODO:      check!
  */
-
-// Macro helper to determine "distance" 
-size_t cws_links_cy_dist(int a, int b, size_t N) {
-    size_t a_amb = std::abs(a-b);
-    size_t a_amb2 = std::abs(N-a_amb);
-
-    return std::min(a_amb, a_amb2);
-}
-
  
 void couple_watts_strogatz(std::vector< std::pair<size_t, size_t> > &couples,
                            size_t C, std::vector< std::pair<size_t, size_t> > &edges,
@@ -1027,7 +1010,7 @@ void couple_watts_strogatz(std::vector< std::pair<size_t, size_t> > &couples,
 /*
  * For a Barabasi-Albert-Network this function this function selects edges to 
  * couple edges. This can be used when a mixed 1 -> 1 / 2->2 - reaction
- * network should be created with an Watts-Strogatz statistics of the reactants 
+ * network should be created with an Barabasi Albert statistics of the reactants 
  * graph. There are just 'C' pairs of links selected (without replacement).
  *
  * couples    - reference to a vector of pairs to that the selected couples are
@@ -1041,7 +1024,6 @@ void couple_watts_strogatz(std::vector< std::pair<size_t, size_t> > &couples,
  * self_loop       - self loops are allowed
  * directed        - directed network is created
  * 
- * TODO: check!
  * TODO: How should the probability of adding a certain couple be estimated.
  *       maximum product of "new edges" functionality or sum of products? 
  */
@@ -1231,24 +1213,25 @@ void couple_barabasi_albert(std::vector< std::pair<size_t, size_t> > &couples,
 
 
 /*
- * For a pan-sinha-network...
+ * For a pan-sinha-network... (similar to above)
  *
  * couples    - reference to a vector of pairs to that the selected couples are
                 written to 0-based 
  * C          - number of couples that are drawn
  * edges      - pairs vector containing the original networks edges
  *
- * h          -
- * m          -
- * r          -
+ * h          - number of binary levels
+ * m          - Number of modules on level 0 that are put in one module on
+ *              level 1 (on higher levels it is allways to / binary tree)
+ * r          - Change linking probability by going one level up (linking
+ *              probability between two nodes is choosen from the lowest 
+ *              level on which they are in the same module)
  *        
  * maintain_p - maintain properties of original network in substrate graph
  *              (properties to maintain have to be given in following parameters)
  * allow_multiple  - the same link can occur multiple times
  * self_loop       - self loops are allowed
  * directed        - directed network is created
- * 
- * TODO: check!
  */
 
 void couple_pan_sinha(std::vector< std::pair<size_t, size_t> > &couples,
@@ -1395,23 +1378,22 @@ void couple_pan_sinha(std::vector< std::pair<size_t, size_t> > &couples,
 
 
 /*
- * For simple modular networks...
+ * For simple modular networks... (similar to above)
  *
  * couples    - reference to a vector of pairs to that the selected couples are
                 written to 0-based 
  * C          - number of couples that are drawn
  * edges      - pairs vector containing the original networks edges
- *
- * m          -
- * r          -
+ * m          - Number of modules 
+ * r          - Change linking probability by going one level up (linking
+ *              probability between two nodes is choosen from the lowest 
+ *              level on which they are in the same module)
  *        
  * maintain_p - maintain properties of original network in substrate graph
  *              (properties to maintain have to be given in following parameters)
  * allow_multiple  - the same link can occur multiple times
  * self_loop       - self loops are allowed
  * directed        - directed network is created
- * 
- * TODO: check!
  */
 
 void couple_simple_modular(std::vector< std::pair<size_t, size_t> > &couples,

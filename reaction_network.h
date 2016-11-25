@@ -647,7 +647,7 @@ class reaction {
 
 
     /*
-     *
+     * Calculate forward reaction rate for this reaction
      */
   
     double calculate_rate_f(double Ea, const std::vector<double>& species_E, bool logscale) {
@@ -670,7 +670,7 @@ class reaction {
 
 
     /*
-     *
+     * Calculate backward reaction rate for this reaction
      */
 
     double calculate_rate_b(double Ea, const std::vector<double>& species_E, bool logscale) {
@@ -693,7 +693,7 @@ class reaction {
 
 
     /*
-     * 
+     * Calculate the effective rate of the reaction from forward and backward reaction rate
      */
 
      double calculate_rate(double Ea, const std::vector<double>& species_E, bool logscale) {
