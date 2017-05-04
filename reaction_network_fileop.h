@@ -1,4 +1,4 @@
-/* author: jakob fischer (jakob@automorph.info)
+/* author: jakob fischer (mail@jakobfischer.eu)
  * date: 9th February 2013
  * description: 
  * Contains methods for writing reaction networks to files and to the 
