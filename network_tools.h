@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <set>
+#include <cassert>
 #include <cstdlib>
 #include <cmath>
 #include <gmp.h>
