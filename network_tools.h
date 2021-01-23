@@ -279,6 +279,8 @@ size_t bps_max_edges(size_t nodes, bool self_loop, bool directed) {
         return nodes*nodes-nodes;
     else if(!self_loop && !directed)
         return (nodes*(nodes-1))/2;
+        
+    assert(false);
 }
 
 
@@ -798,7 +800,7 @@ void couple_erdos_renyi(std::vector< std::pair<size_t, size_t> > &couples,
 // Macro helper to determine "distance" 
 size_t cws_links_cy_dist(int a, int b, size_t N) {
     size_t a_amb = std::abs(a-b);
-    size_t a_amb2 = std::abs(N-a_amb);
+    size_t a_amb2 = std::abs(int(N)-int(a_amb));
 
     return std::min(a_amb, a_amb2);
 }
