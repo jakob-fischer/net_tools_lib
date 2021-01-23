@@ -510,7 +510,7 @@ class reaction {
      * DEPRECATED
      */
     
-    size_t set_educt_id(size_t i, size_t n) {  educts[i].first = n;  }
+    void set_educt_id(size_t i, size_t n) {  educts[i].first = n;  }
 
 
     /*
@@ -518,7 +518,7 @@ class reaction {
      * DEPRECATED
      */
     
-    double get_educt_mul(size_t i) const {  return educts[i].second;  }
+    size_t get_educt_mul(size_t i) const {  return educts[i].second;  }
 
 
     /*
@@ -603,7 +603,7 @@ class reaction {
      * DEPRECATED
      */
     
-    size_t set_product_id(size_t i, size_t n) {  products[i].first = n;  }
+    void set_product_id(size_t i, size_t n) {  products[i].first = n;  }
         
         
     /*
